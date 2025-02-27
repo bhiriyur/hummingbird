@@ -94,3 +94,6 @@ const BldgDynamics = (props: building_properties): output_properties => {
     Wy,
   };
 };
+
+
+export default BldgDynamics;
