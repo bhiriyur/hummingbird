@@ -140,7 +140,7 @@ const BuildingDesign = (units: UnitSytem) => {
               console.log(bldgSystem);
               setbldgSystem(e.target.value);
             }}
-            id="bldfStructuralSystem"
+            id="bldgStructuralSystem"
             label="Structural System"
             variant={VARIANT}
           >

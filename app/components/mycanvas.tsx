@@ -1,18 +1,15 @@
 "use client";
-
-import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
-import { useTheme } from "@mui/material/styles";
+import Card from "@mui/material/Card";
 import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
-import Typography from "@mui/material/Typography";
 import * as React from "react";
+import BuildingThreeD from "./buildingThreeD";
 
 interface TabPanelProps {
   children?: React.ReactNode;
-  dir?: string;
-  index: number;
   value: number;
+  index: number;
 }
 
 function TabPanel(props: TabPanelProps) {
@@ -24,13 +21,10 @@ function TabPanel(props: TabPanelProps) {
       hidden={value !== index}
       id={`full-width-tabpanel-${index}`}
       aria-labelledby={`full-width-tab-${index}`}
+      style={{height: "600px"}}
       {...other}
     >
-      {value === index && (
-        <Box sx={{ p: 3 }}>
-          <Typography>{children}</Typography>
-        </Box>
-      )}
+      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
     </div>
   );
 }
@@ -43,42 +37,39 @@ function a11yProps(index: number) {
 }
 
 const MyCanvas = () => {
-  const theme = useTheme();
   const [value, setValue] = React.useState(0);
 
-  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
-    console.log("Setting value to ", newValue)
-    setValue(newValue);
-  };
-
   return (
-    <div style={{ backgroundColor: "white", height: "100%" }}>
-      <Box sx={{ bgcolor: "background.paper", width: "100%" }}>
-        <AppBar position="static">
-          <Tabs
-            value={value}
-            onChange={handleChange}
-            indicatorColor="secondary"
-            textColor="inherit"
-            variant="fullWidth"
-            aria-label="full width tabs example"
-          >
-            <Tab value={0} label="Item One" {...a11yProps(0)} />
-            <Tab value={1}  label="Item Two" {...a11yProps(1)} />
-            <Tab value={2}  label="Item Three" {...a11yProps(2)} />
-          </Tabs>
-        </AppBar>
-        <TabPanel value={0} index={0} dir={theme.direction}>
-          Item One
-        </TabPanel>
-        <TabPanel value={1} index={1} dir={theme.direction}>
-          Item Two
-        </TabPanel>
-        <TabPanel value={2} index={2} dir={theme.direction}>
-          Item Three
-        </TabPanel>
-      </Box>
-    </div>
+    <Card sx={{ height: "100%", bgcolor: "#FFFFFA" }}>
+      <Tabs
+        value={value}
+        onChange={(e, newValue: number) => {
+          setValue(newValue);
+        }}
+        indicatorColor="secondary"
+        textColor="inherit"
+        variant="fullWidth"
+        aria-label="tabs"
+      >
+        <Tab label="Building" {...a11yProps(0)} />
+        <Tab label="Damper" {...a11yProps(1)} />
+        <Tab label="Performance" {...a11yProps(2)} />
+      </Tabs>
+      <TabPanel value={value} index={0}>
+        <BuildingThreeD
+          height={450}
+          numFLoors={45}
+          xWidth={50}
+          yWidth={40}
+        ></BuildingThreeD>
+      </TabPanel>
+      <TabPanel value={value} index={1}>
+        Damper Design
+      </TabPanel>
+      <TabPanel value={value} index={2}>
+        Damper Performance
+      </TabPanel>
+    </Card>
   );
 };
 
