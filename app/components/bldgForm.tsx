@@ -14,12 +14,15 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { useState } from "react";
 
-const VARIANT = "outlined";
-const TIMEUNIT = "s";
-const FORCEUNIT = "kips";
-const LENGTHUNIT = "ft";
+interface UnitSytem {
+  force?: string
+  length?: string
+  time?: string
+}
 
-const BuildingDesign = () => {
+const VARIANT = "outlined";
+
+const BuildingDesign = (units: UnitSytem) => {
   const [numFloors, setNumFloors] = useState(42);
   const [bldgHeight, setbldgHeight] = useState(450);
   const [bldgXwidth, setbldgXwidth] = useState(80);
@@ -78,7 +81,7 @@ const BuildingDesign = () => {
             slotProps={{
               input: {
                 endAdornment: (
-                  <InputAdornment position="end">{LENGTHUNIT}</InputAdornment>
+                  <InputAdornment position="end">{units.length}</InputAdornment>
                 ),
               },
             }}
@@ -98,7 +101,7 @@ const BuildingDesign = () => {
             slotProps={{
               input: {
                 endAdornment: (
-                  <InputAdornment position="end">{LENGTHUNIT}</InputAdornment>
+                  <InputAdornment position="end">{units.length}</InputAdornment>
                 ),
               },
             }}
@@ -118,7 +121,7 @@ const BuildingDesign = () => {
             slotProps={{
               input: {
                 endAdornment: (
-                  <InputAdornment position="end">{LENGTHUNIT}</InputAdornment>
+                  <InputAdornment position="end">{units.length}</InputAdornment>
                 ),
               },
             }}
@@ -171,7 +174,7 @@ const BuildingDesign = () => {
             slotProps={{
               input: {
                 endAdornment: (
-                  <InputAdornment position="end">{TIMEUNIT}</InputAdornment>
+                  <InputAdornment position="end">{units.time}</InputAdornment>
                 ),
                 startAdornment: (
                   <InputAdornment position="start">
@@ -247,7 +250,7 @@ const BuildingDesign = () => {
             slotProps={{
               input: {
                 endAdornment: (
-                  <InputAdornment position="end">{FORCEUNIT}</InputAdornment>
+                  <InputAdornment position="end">{units.force}</InputAdornment>
                 ),
                 startAdornment: (
                   <InputAdornment position="start">
@@ -287,7 +290,7 @@ const BuildingDesign = () => {
             slotProps={{
               input: {
                 endAdornment: (
-                  <InputAdornment position="end">{TIMEUNIT}</InputAdornment>
+                  <InputAdornment position="end">{units.time}</InputAdornment>
                 ),
                 startAdornment: (
                   <InputAdornment position="start">
@@ -363,7 +366,7 @@ const BuildingDesign = () => {
             slotProps={{
               input: {
                 endAdornment: (
-                  <InputAdornment position="end">{FORCEUNIT}</InputAdornment>
+                  <InputAdornment position="end">{units.force}</InputAdornment>
                 ),
                 startAdornment: (
                   <InputAdornment position="start">
@@ -392,8 +395,17 @@ const BuildingDesign = () => {
   );
 };
 
-const DamperPerformance = () => {
+const DamperPerformance = (units: UnitSytem) => {
   const systems = ["On Roof", "In Modules"];
+  const [xDamperLocation, setxDamperLocation] = useState(systems[0]);
+  const [yDamperLocation, setyDamperLocation] = useState(systems[1]);
+  const [xAccelReduction, setxAccelReduction] = useState(40);
+  const [yAccelReduction, setyAccelReduction] = useState(30);
+  const [xTotalDamping, setxTotalDamping] = useState(1.5);
+  const [yTotalDamping, setyTotalDamping] = useState(1.2);
+  const [moduleLength, setmoduleLength] = useState(20);
+  const [moduleWidth, setmoduleWidth] = useState(8);
+
   return (
     <Box sx={{ width: "100%" }}>
       <Grid container rowSpacing={2} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
@@ -402,7 +414,8 @@ const DamperPerformance = () => {
           <TextField
             fullWidth
             select
-            value={systems[0]}
+            value={xDamperLocation}
+            onChange = {(e) => {setxDamperLocation(e.target.value)}}
             id="damperLocationX"
             label="X-Damper Location"
             variant={VARIANT}
@@ -417,21 +430,33 @@ const DamperPerformance = () => {
         <Grid size={4}>
           <TextField
             fullWidth
-            value={80}
+            value={xAccelReduction}
+            onChange = {(e) => {setxAccelReduction(Number(e.target.value))}}
             id="acclReductionX"
             label="X-Accln. Reduction"
             variant={VARIANT}
             type="number"
+            slotProps={{
+              input: {
+                endAdornment: <InputAdornment position="end">%</InputAdornment>,
+              },
+            }}
           ></TextField>
         </Grid>
         <Grid size={4}>
           <TextField
             fullWidth
-            value={80}
+            value={xTotalDamping}
             id="totalDampingX"
+            onChange = {(e) => {setxTotalDamping(Number(e.target.value))}}
             label="X-Total Damping"
             variant={VARIANT}
             type="number"
+            slotProps={{
+              input: {
+                endAdornment: <InputAdornment position="end">%</InputAdornment>,
+              },
+            }}
           ></TextField>
         </Grid>
 
@@ -440,7 +465,8 @@ const DamperPerformance = () => {
           <TextField
             fullWidth
             select
-            value={systems[1]}
+            value={yDamperLocation}
+            onChange = {(e) => {setyDamperLocation(e.target.value)}}
             id="damperLocationY"
             label="Y-Damper Location"
             variant={VARIANT}
@@ -455,42 +481,66 @@ const DamperPerformance = () => {
         <Grid size={4}>
           <TextField
             fullWidth
-            value={80}
+            value={yAccelReduction}
+            onChange = {(e) => {setyAccelReduction(Number(e.target.value))}}
             id="acclReductionY"
             label="Y-Accln. Reduction"
             variant={VARIANT}
             type="number"
+            slotProps={{
+              input: {
+                endAdornment: <InputAdornment position="end">%</InputAdornment>,
+              },
+            }}
           ></TextField>
         </Grid>
         <Grid size={4}>
           <TextField
             fullWidth
-            value={80}
+            value={yTotalDamping}
+            onChange = {(e) => {setyTotalDamping(Number(e.target.value))}}
             id="totalDampingY"
             label="Y-Total Damping"
             variant={VARIANT}
             type="number"
+            slotProps={{
+              input: {
+                endAdornment: <InputAdornment position="end">%</InputAdornment>,
+              },
+            }}
           ></TextField>
         </Grid>
 
         <Grid size={4}>
           <TextField
             fullWidth
-            value={80}
+            value={moduleLength}
+            onChange = {(e) => {setmoduleLength(Number(e.target.value))}}
             id="moduleLength"
             label="Module Length"
             variant={VARIANT}
             type="number"
+            slotProps={{
+              input: {
+                endAdornment: <InputAdornment position="end">{units.length}</InputAdornment>,
+              },
+            }}
           ></TextField>
         </Grid>
         <Grid size={4}>
           <TextField
             fullWidth
-            value={80}
+            value={moduleWidth}
+            onChange = {(e) => {setmoduleWidth(Number(e.target.value))}}
             id="moduleWidth"
             label="Module Width"
             variant={VARIANT}
             type="number"
+            slotProps={{
+              input: {
+                endAdornment: <InputAdornment position="end">{units.length}</InputAdornment>,
+              },
+            }}
           ></TextField>
         </Grid>
       </Grid>
@@ -510,7 +560,11 @@ const BuildingForm = () => {
           <Typography component="span">BUILDING</Typography>
         </AccordionSummary>
         <AccordionDetails>
-          <BuildingDesign />
+          <BuildingDesign
+            force = "kips"
+            length = "ft"
+            time = "s"
+          />
         </AccordionDetails>
       </Accordion>
 
@@ -523,7 +577,11 @@ const BuildingForm = () => {
           <Typography component="h1">DAMPER</Typography>
         </AccordionSummary>
         <AccordionDetails>
-          <DamperPerformance />
+          <DamperPerformance 
+            force = "kips"
+            length = "ft"
+            time = "s"          
+          />
         </AccordionDetails>
       </Accordion>
     </div>
