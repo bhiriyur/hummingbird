@@ -7,18 +7,17 @@ import Accordion from "@mui/material/Accordion";
 import AccordionDetails from "@mui/material/AccordionDetails";
 import AccordionSummary from "@mui/material/AccordionSummary";
 import Box from "@mui/material/Box";
-import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
 import InputAdornment from "@mui/material/InputAdornment";
 import MenuItem from "@mui/material/MenuItem";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { useState } from "react";
-import { IndexType } from "typescript";
 
 const VARIANT = "outlined";
 const TIMEUNIT = "s";
-const FORCEUNIT = "kips"
+const FORCEUNIT = "kips";
+const LENGTHUNIT = "ft";
 
 const BuildingDesign = () => {
   const [numFloors, setNumFloors] = useState(42);
@@ -34,23 +33,20 @@ const BuildingDesign = () => {
   const [yPeriodChecked, setyPeriodChecked] = useState(true);
   const [yPeriod, setyPeriod] = useState(4.0);
 
-
-  const [xIntrinsicDampingChecked, setxIntrinsicDampingChecked] = useState(true);
+  const [xIntrinsicDampingChecked, setxIntrinsicDampingChecked] =
+    useState(true);
   const [xIntrinsicDamping, setxIntrinsicDamping] = useState(0.7);
 
-  const [yIntrinsicDampingChecked, setyIntrinsicDampingChecked] = useState(true);
-  const [yIntrinsicDamping, setyIntrinsicDamping] = useState(0.7);  
+  const [yIntrinsicDampingChecked, setyIntrinsicDampingChecked] =
+    useState(true);
+  const [yIntrinsicDamping, setyIntrinsicDamping] = useState(0.7);
 
-  
   const [xModalMassChecked, setxModalMassChecked] = useState(true);
   const [xModalMass, setxModalMass] = useState(2000);
 
   const [yModalMassChecked, setyModalMassChecked] = useState(true);
   const [yModalMass, setyModalMass] = useState(2000);
 
-  const [checked, setChecked] = useState(true);
-  const handleClick = () => setChecked(!checked);
-  
   return (
     <Box sx={{ width: "100%" }}>
       <Grid container rowSpacing={2} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
@@ -58,8 +54,10 @@ const BuildingDesign = () => {
         <Grid size={3}>
           <TextField
             fullWidth
-            defaultValue={numFloors}
-            onChange={(e) => {setNumFloors(Number(e.target.value));}}
+            value={numFloors}
+            onChange={(e) => {
+              setNumFloors(Number(e.target.value));
+            }}
             id="bldgFloors"
             label="Number of Floors"
             variant={VARIANT}
@@ -69,34 +67,61 @@ const BuildingDesign = () => {
         <Grid size={3}>
           <TextField
             fullWidth
-            defaultValue={bldgHeight}
-            onChange={(e) => {setbldgHeight(Number(e.target.value));}}
+            value={bldgHeight}
+            onChange={(e) => {
+              setbldgHeight(Number(e.target.value));
+            }}
             id="bldgHeight"
             label="Building Height"
             variant={VARIANT}
             type="number"
+            slotProps={{
+              input: {
+                endAdornment: (
+                  <InputAdornment position="end">{LENGTHUNIT}</InputAdornment>
+                ),
+              },
+            }}
           ></TextField>
         </Grid>
         <Grid size={3}>
           <TextField
             fullWidth
-            defaultValue={bldgXwidth}
-            onChange={(e) => {setbldgXwidth(Number(e.target.value));}}
+            value={bldgXwidth}
+            onChange={(e) => {
+              setbldgXwidth(Number(e.target.value));
+            }}
             id="bldgXWidth"
             label="X Width"
             variant={VARIANT}
             type="number"
+            slotProps={{
+              input: {
+                endAdornment: (
+                  <InputAdornment position="end">{LENGTHUNIT}</InputAdornment>
+                ),
+              },
+            }}
           ></TextField>
         </Grid>
         <Grid size={3}>
           <TextField
             fullWidth
-            defaultValue={bldgYwidth}
-            onChange={(e) => {setbldgYwidth(Number(e.target.value));}}
+            value={bldgYwidth}
+            onChange={(e) => {
+              setbldgYwidth(Number(e.target.value));
+            }}
             id="bldgYWidth"
             label="Y Width"
             variant={VARIANT}
             type="number"
+            slotProps={{
+              input: {
+                endAdornment: (
+                  <InputAdornment position="end">{LENGTHUNIT}</InputAdornment>
+                ),
+              },
+            }}
           ></TextField>
         </Grid>
 
@@ -104,9 +129,14 @@ const BuildingDesign = () => {
         <Grid size={12}>
           <TextField
             fullWidth
-            select
-            defaultValue={bldgSystem}
-            onChange={(e) => setbldgSystem(e.target.value)}>
+            select={true}
+            value={bldgSystem}
+            onChange={(e) => {
+              console.log(e);
+              console.log(e.target.value);
+              console.log(bldgSystem);
+              setbldgSystem(e.target.value);
+            }}
             id="bldfStructuralSystem"
             label="Structural System"
             variant={VARIANT}
@@ -130,7 +160,10 @@ const BuildingDesign = () => {
         <Grid size={4}>
           <TextField
             fullWidth
-            defaultValue={xPeriod}
+            value={xPeriod}
+            onChange={(e) => {
+              setxPeriod(Number(e.target.value));
+            }}
             id="periodX"
             label="X-Period"
             variant={VARIANT}
@@ -144,7 +177,9 @@ const BuildingDesign = () => {
                   <InputAdornment position="start">
                     <IconButton
                       aria-label={xPeriodChecked ? "Default" : "Override"}
-                      onClick={() => {setxPeriodChecked(!xPeriodChecked)}}
+                      onClick={() => {
+                        setxPeriodChecked(!xPeriodChecked);
+                      }}
                       edge="start"
                       size="small"
                     >
@@ -163,21 +198,26 @@ const BuildingDesign = () => {
         <Grid size={4}>
           <TextField
             fullWidth
-            defaultValue={xIntrinsicDamping}
+            value={xIntrinsicDamping}
+            onChange={(e) => {
+              setxIntrinsicDamping(Number(e.target.value));
+            }}
             id="intrinsicDampingX"
             label="X-Intrinsic Damping"
             variant={VARIANT}
             type="number"
             slotProps={{
               input: {
-                endAdornment: (
-                  <InputAdornment position="end">%</InputAdornment>
-                ),
+                endAdornment: <InputAdornment position="end">%</InputAdornment>,
                 startAdornment: (
                   <InputAdornment position="start">
                     <IconButton
-                      aria-label={xIntrinsicDampingChecked ? "Default" : "Override"}
-                      onClick={() => {setxIntrinsicDampingChecked(!xIntrinsicDampingChecked)}}
+                      aria-label={
+                        xIntrinsicDampingChecked ? "Default" : "Override"
+                      }
+                      onClick={() => {
+                        setxIntrinsicDampingChecked(!xIntrinsicDampingChecked);
+                      }}
                       edge="start"
                       size="small"
                     >
@@ -196,7 +236,10 @@ const BuildingDesign = () => {
         <Grid size={4}>
           <TextField
             fullWidth
-            defaultValue={xModalMass}
+            value={xModalMass}
+            onChange={(e) => {
+              setxModalMass(Number(e.target.value));
+            }}
             id="modalMassX"
             label="X-Modal Mass"
             variant={VARIANT}
@@ -210,7 +253,9 @@ const BuildingDesign = () => {
                   <InputAdornment position="start">
                     <IconButton
                       aria-label={xModalMassChecked ? "Default" : "Override"}
-                      onClick={() => {setxModalMassChecked(!xModalMassChecked)}}
+                      onClick={() => {
+                        setxModalMassChecked(!xModalMassChecked);
+                      }}
                       edge="start"
                       size="small"
                     >
@@ -232,6 +277,9 @@ const BuildingDesign = () => {
           <TextField
             fullWidth
             value={yPeriod}
+            onChange={(e) => {
+              setyPeriod(Number(e.target.value));
+            }}
             id="periodY"
             label="Y-Period"
             variant={VARIANT}
@@ -245,7 +293,9 @@ const BuildingDesign = () => {
                   <InputAdornment position="start">
                     <IconButton
                       aria-label={yPeriodChecked ? "Default" : "Override"}
-                      onClick={() => {setyPeriodChecked(!yPeriodChecked)}}
+                      onClick={() => {
+                        setyPeriodChecked(!yPeriodChecked);
+                      }}
                       edge="start"
                       size="small"
                     >
@@ -265,20 +315,25 @@ const BuildingDesign = () => {
           <TextField
             fullWidth
             value={yIntrinsicDamping}
+            onChange={(e) => {
+              setyIntrinsicDamping(Number(e.target.value));
+            }}
             id="intrinsicDampingY"
             label="Y-Intrinsic Damping"
             variant={VARIANT}
             type="number"
             slotProps={{
               input: {
-                endAdornment: (
-                  <InputAdornment position="end">%</InputAdornment>
-                ),
+                endAdornment: <InputAdornment position="end">%</InputAdornment>,
                 startAdornment: (
                   <InputAdornment position="start">
                     <IconButton
-                      aria-label={yIntrinsicDampingChecked ? "Default" : "Override"}
-                      onClick={() => {setyIntrinsicDampingChecked(!yIntrinsicDampingChecked)}}
+                      aria-label={
+                        yIntrinsicDampingChecked ? "Default" : "Override"
+                      }
+                      onClick={() => {
+                        setyIntrinsicDampingChecked(!yIntrinsicDampingChecked);
+                      }}
                       edge="start"
                       size="small"
                     >
@@ -298,6 +353,9 @@ const BuildingDesign = () => {
           <TextField
             fullWidth
             value={yModalMass}
+            onChange={(e) => {
+              setyModalMass(Number(e.target.value));
+            }}
             id="modalMassY"
             label="Y-Modal Mass"
             variant={VARIANT}
@@ -311,7 +369,9 @@ const BuildingDesign = () => {
                   <InputAdornment position="start">
                     <IconButton
                       aria-label={yModalMassChecked ? "Default" : "Override"}
-                      onClick={() => {setyModalMassChecked(!yModalMassChecked)}}
+                      onClick={() => {
+                        setyModalMassChecked(!yModalMassChecked);
+                      }}
                       edge="start"
                       size="small"
                     >
@@ -335,7 +395,7 @@ const BuildingDesign = () => {
 const DamperPerformance = () => {
   const systems = ["On Roof", "In Modules"];
   return (
-    <Box sx={{ width: "100%"}}>
+    <Box sx={{ width: "100%" }}>
       <Grid container rowSpacing={2} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
         {/* X Damper */}
         <Grid size={4}>
@@ -422,7 +482,7 @@ const DamperPerformance = () => {
             variant={VARIANT}
             type="number"
           ></TextField>
-        </Grid>  
+        </Grid>
         <Grid size={4}>
           <TextField
             fullWidth
@@ -432,7 +492,7 @@ const DamperPerformance = () => {
             variant={VARIANT}
             type="number"
           ></TextField>
-        </Grid>                
+        </Grid>
       </Grid>
     </Box>
   );
@@ -441,7 +501,7 @@ const DamperPerformance = () => {
 const BuildingForm = () => {
   return (
     <div>
-      <Accordion defaultExpanded sx={{backgroundColor: "#FFFFFA"}}>
+      <Accordion defaultExpanded sx={{ backgroundColor: "#FFFFFA" }}>
         <AccordionSummary
           expandIcon={<ExpandMoreIcon />}
           aria-controls="panel1-content"
@@ -454,7 +514,7 @@ const BuildingForm = () => {
         </AccordionDetails>
       </Accordion>
 
-      <Accordion defaultExpanded sx={{backgroundColor: "#FFFFFA"}}>
+      <Accordion defaultExpanded sx={{ backgroundColor: "#FFFFFA" }}>
         <AccordionSummary
           expandIcon={<ExpandMoreIcon />}
           aria-controls="panel1-content"
