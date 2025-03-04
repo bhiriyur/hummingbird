@@ -2,7 +2,7 @@ const CONSTANTS = {
   wm: 250, // Module area mass (kg / m^2)
   wf: 75, // Facade area mass (kg / m ^2)
   acclg: 9.807, // (accln due to graviTY: m / s**2)
-  AccTargetBuild: 18*9.807/1000,
+  AccTargetBuild: (18 * 9.807) / 1000,
   FreqMod: 1.0, // 100 %
   MembraneFill: 0.55, // 55%
   ExtraVolumeFactor: 1.05, // 105%
@@ -10,7 +10,7 @@ const CONSTANTS = {
   CylDiameter: 0.9, // 90 cm
   RhoWater: 998, // Density of water in kg / m**3
   HeatCapacityRatioAir: 1.4,
-  Patm: 1.013e5,   // N / m**2 (1 atm)
+  Patm: 1.013e5, // N / m**2 (1 atm)
 };
 
 enum unit_systems {
@@ -82,7 +82,7 @@ const BldgDynamics = (
     OptionY,
   } = damperProps;
 
-  console.log("Inputs: ",  bldgProps, damperProps);
+  console.log("Inputs: ", bldgProps, damperProps);
 
   if (units === 1) {
     BX = ft2m(BX);
@@ -112,7 +112,7 @@ const BldgDynamics = (
     ZetaY = 1.5 / 100;
   }
 
-  console.log("TX, TY, ZetaX, ZetaY = ", TX, TY, ZetaX, ZetaY)
+  console.log("TX, TY, ZetaX, ZetaY = ", TX, TY, ZetaX, ZetaY);
 
   const Beta = (H: number, B: number) => {
     // Beta coefficient for Modal mass calcs
@@ -130,8 +130,7 @@ const BldgDynamics = (
 
   // Building Mass
   const Wb =
-    CONSTANTS.wm * (N * BX * BY) +
-    CONSTANTS.wf * (2 * BX + 2 * BY) * H;
+    CONSTANTS.wm * (N * BX * BY) + CONSTANTS.wf * (2 * BX + 2 * BY) * H;
 
   // Modal Mass (tonnes / kips)
   const WX = (units == 1 ? kgs2lbs(1) : 1) * Beta(H, BX) * Wb * 0.001;
@@ -155,8 +154,18 @@ const BldgDynamics = (
   const AccRatioX = Math.sqrt(ZetaX / (ZetaX + ZetaAddHBX));
   const AccRatioY = Math.sqrt(ZetaY / (ZetaY + ZetaAddHBY));
 
-  console.log("ZetaAddHBX, ZetaTotalX, AccRatioX = ", ZetaAddHBX, ZetaTotalX, AccRatioX);
-  console.log("ZetaAddHBY, ZetaTotalY, AccRatioY = ", ZetaAddHBY, ZetaTotalY, AccRatioY);
+  console.log(
+    "ZetaAddHBX, ZetaTotalX, AccRatioX = ",
+    ZetaAddHBX,
+    ZetaTotalX,
+    AccRatioX
+  );
+  console.log(
+    "ZetaAddHBY, ZetaTotalY, AccRatioY = ",
+    ZetaAddHBY,
+    ZetaTotalY,
+    AccRatioY
+  );
 
   const temp_MuX =
     6 * ZetaAddHBX ** 2 +
@@ -179,20 +188,42 @@ const BldgDynamics = (
   const AccUndampedX = CONSTANTS.AccTargetBuild / AccRatioX;
   const AccUndampedY = CONSTANTS.AccTargetBuild / AccRatioY;
 
-  const freqHBX = Math.sqrt(1 + 0.5 * MuX) / (1 + MuX) * (1 / TX);
-  const freqHBY = Math.sqrt(1 + 0.5 * MuY) / (1 + MuY) * (1 / TY);
+  const freqHBX = (Math.sqrt(1 + 0.5 * MuX) / (1 + MuX)) * (1 / TX);
+  const freqHBY = (Math.sqrt(1 + 0.5 * MuY) / (1 + MuY)) * (1 / TY);
 
-  const DispTargetBuildX = CONSTANTS.AccTargetBuild / (2 * Math.PI * freqHBX * CONSTANTS.FreqMod) ** 2;
-  const DispTargetBuildY = CONSTANTS.AccTargetBuild / (2 * Math.PI * freqHBY * CONSTANTS.FreqMod) ** 2;
+  const DispTargetBuildX =
+    CONSTANTS.AccTargetBuild / (2 * Math.PI * freqHBX * CONSTANTS.FreqMod) ** 2;
+  const DispTargetBuildY =
+    CONSTANTS.AccTargetBuild / (2 * Math.PI * freqHBY * CONSTANTS.FreqMod) ** 2;
 
-  const DispTargetHBX = DispTargetBuildX * (1 + MuX) / (Math.sqrt(2 * MuX + 1.5 * (MuX) ** 2));
-  const DispTargetHBY = DispTargetBuildY * (1 + MuY) / (Math.sqrt(2 * MuY + 1.5 * (MuY) ** 2));
+  const DispTargetHBX =
+    (DispTargetBuildX * (1 + MuX)) / Math.sqrt(2 * MuX + 1.5 * MuX ** 2);
+  const DispTargetHBY =
+    (DispTargetBuildY * (1 + MuY)) / Math.sqrt(2 * MuY + 1.5 * MuY ** 2);
 
-  const MembrangeLengthX = DispTargetHBX / (1 - CONSTANTS.MembraneFill) * CONSTANTS.ExtraVolumeFactor;
-  const MembrangeLengthY = DispTargetHBY / (1 - CONSTANTS.MembraneFill) * CONSTANTS.ExtraVolumeFactor;
+  const MembrangeLengthX =
+    (DispTargetHBX / (1 - CONSTANTS.MembraneFill)) *
+    CONSTANTS.ExtraVolumeFactor;
+  const MembrangeLengthY =
+    (DispTargetHBY / (1 - CONSTANTS.MembraneFill)) *
+    CONSTANTS.ExtraVolumeFactor;
 
-  console.log("totalUsefulWaterMassX, AccUndampedX, freqHBX, DispTargetBuildX, MembrangeLengthX = ", totalUsefulWaterMassX, AccUndampedX, freqHBX, DispTargetBuildX, MembrangeLengthX)
-  console.log("totalUsefulWaterMassY, AccUndampedY, freqHBY, DispTargetBuildY, MembrangeLengthY = ", totalUsefulWaterMassY, AccUndampedY, freqHBY, DispTargetBuildY, MembrangeLengthY)
+  console.log(
+    "totalUsefulWaterMassX, AccUndampedX, freqHBX, DispTargetBuildX, MembrangeLengthX = ",
+    totalUsefulWaterMassX,
+    AccUndampedX,
+    freqHBX,
+    DispTargetBuildX,
+    MembrangeLengthX
+  );
+  console.log(
+    "totalUsefulWaterMassY, AccUndampedY, freqHBY, DispTargetBuildY, MembrangeLengthY = ",
+    totalUsefulWaterMassY,
+    AccUndampedY,
+    freqHBY,
+    DispTargetBuildY,
+    MembrangeLengthY
+  );
 
   let MaxCycleLengthX = BX;
   let MaxCycleLengthY = BY;
@@ -200,14 +231,34 @@ const BldgDynamics = (
   if (LocX === 2) MaxCycleLengthX = ModL;
   if (LocY === 2) MaxCycleLengthY = ModL;
 
-  const CenterLengthX = MaxCycleLengthX - 2 * MembrangeLengthX - CONSTANTS.AdditionalLongitudinalClearance;
-  const CenterLengthY = MaxCycleLengthY - 2 * MembrangeLengthY - CONSTANTS.AdditionalLongitudinalClearance;
+  const CenterLengthX =
+    MaxCycleLengthX -
+    2 * MembrangeLengthX -
+    CONSTANTS.AdditionalLongitudinalClearance;
+  const CenterLengthY =
+    MaxCycleLengthY -
+    2 * MembrangeLengthY -
+    CONSTANTS.AdditionalLongitudinalClearance;
 
-  const AreaCenter = Math.PI * CONSTANTS.CylDiameter ** 2 / 4.0;
+  const AreaCenter = (Math.PI * CONSTANTS.CylDiameter ** 2) / 4.0;
   const AreaMemHor = CONSTANTS.MembraneFill * AreaCenter;
-  
+
   const AreaMemVertX = CONSTANTS.CylDiameter * MembrangeLengthX;
   const AreaMemVertY = CONSTANTS.CylDiameter * MembrangeLengthY;
+
+  console.log("AreaCenter, AreaMemHor = ", AreaCenter, AreaMemHor);
+  console.log(
+    "MaxCycleLengthX, CenterLengthX, AreaMemVertX = ",
+    MaxCycleLengthX,
+    CenterLengthX,
+    AreaMemVertX
+  );
+  console.log(
+    "MaxCycleLengthY, CenterLengthY, AreaMemVertY = ",
+    MaxCycleLengthY,
+    CenterLengthY,
+    AreaMemVertY
+  );
 
   const MassCenterX = CONSTANTS.RhoWater * AreaCenter * CenterLengthX;
   const MassCenterY = CONSTANTS.RhoWater * AreaCenter * CenterLengthY;
@@ -218,8 +269,27 @@ const BldgDynamics = (
   const MassEndVertX = CONSTANTS.RhoWater * AreaMemVertX * MembrangeLengthX;
   const MassEndVertY = CONSTANTS.RhoWater * AreaMemVertY * MembrangeLengthY;
 
-  const WaterMassPerCylinderX = CONSTANTS.RhoWater * AreaCenter * CenterLengthX + 2 * CONSTANTS.RhoWater * AreaMemHor * MembrangeLengthX;
-  const WaterMassPerCylinderY = CONSTANTS.RhoWater * AreaCenter * CenterLengthY + 2 * CONSTANTS.RhoWater * AreaMemHor * MembrangeLengthY;
+  const WaterMassPerCylinderX =
+    CONSTANTS.RhoWater * AreaCenter * CenterLengthX +
+    2 * CONSTANTS.RhoWater * AreaMemHor * MembrangeLengthX;
+  const WaterMassPerCylinderY =
+    CONSTANTS.RhoWater * AreaCenter * CenterLengthY +
+    2 * CONSTANTS.RhoWater * AreaMemHor * MembrangeLengthY;
+
+  console.log(
+    "MassCenterX, MassEndHorX, MassEndVertX, WaterMassPerCylinderX = ",
+    MassCenterX,
+    MassEndHorX,
+    MassEndVertX,
+    WaterMassPerCylinderX
+  );
+  console.log(
+    "MassCenterY, MassEndHorY, MassEndVertY, WaterMassPerCylinderY = ",
+    MassCenterY,
+    MassEndHorY,
+    MassEndVertY,
+    WaterMassPerCylinderY
+  );
 
   const r1X = AreaMemVertX / AreaCenter;
   const r1Y = AreaMemVertY / AreaCenter;
@@ -230,39 +300,96 @@ const BldgDynamics = (
   const kStarX = 2 * CONSTANTS.RhoWater * CONSTANTS.acclg * AreaMemVertX;
   const kStarY = 2 * CONSTANTS.RhoWater * CONSTANTS.acclg * AreaMemVertY;
 
-  const mStarX = MassCenterX * r1X + MassEndHorX * (r2X ** 2) + MassEndVertX;
-  const mStarY = MassCenterY * r1Y + MassEndHorY * (r2Y ** 2) + MassEndVertY;
+  const mStarX = MassCenterX * r1X + MassEndHorX * r2X ** 2 + MassEndVertX;
+  const mStarY = MassCenterY * r1Y + MassEndHorY * r2Y ** 2 + MassEndVertY;
 
   const gammaStarX = MassCenterX * r1X + MassEndHorX * r2X;
   const gammaStarY = MassCenterY * r1Y + MassEndHorY * r2Y;
 
-  const freqStarX = 1 / (2 * Math.PI) * Math.sqrt(kStarX / mStarX);
-  const freqStarY = 1 / (2 * Math.PI) * Math.sqrt(kStarY / mStarY);
+  const freqStarX = (1 / (2 * Math.PI)) * Math.sqrt(kStarX / mStarX);
+  const freqStarY = (1 / (2 * Math.PI)) * Math.sqrt(kStarY / mStarY);
 
-  const massUsefulX = (gammaStarX ** 2) / mStarX;
-  const massUsefulY = (gammaStarY ** 2) / mStarY;
+  console.log(
+    "r1X, r2X, kStarX, gammaStarX, freqStarX = ",
+    r1X,
+    r2X,
+    kStarX,
+    gammaStarX,
+    freqStarX
+  );
+  console.log(
+    "r1Y, r2Y, kStarY, gammaStarY, freqStarY = ",
+    r1Y,
+    r2Y,
+    kStarY,
+    gammaStarY,
+    freqStarY
+  );
 
-  const kGravityX = ((2 * Math.PI * freqStarX) ** 2) * massUsefulX;
-  const kGravityY = ((2 * Math.PI * freqStarY) ** 2) * massUsefulY;
+  const massUsefulX = gammaStarX ** 2 / mStarX;
+  const massUsefulY = gammaStarY ** 2 / mStarY;
 
-  const kAirSpringX = ((2 * Math.PI * freqHBX) ** 2) * massUsefulX - kGravityX;
-  const kAirSpringY = ((2 * Math.PI * freqHBY) ** 2) * massUsefulY - kGravityY;
+  const kGravityX = (2 * Math.PI * freqStarX) ** 2 * massUsefulX;
+  const kGravityY = (2 * Math.PI * freqStarY) ** 2 * massUsefulY;
+
+  const kAirSpringX = (2 * Math.PI * freqHBX) ** 2 * massUsefulX - kGravityX;
+  const kAirSpringY = (2 * Math.PI * freqHBY) ** 2 * massUsefulY - kGravityY;
 
   const kTotalX = kGravityX + kAirSpringX;
   const kTotalY = kGravityY + kAirSpringY;
 
-  const AreaAir = Math.PI * (CONSTANTS.CylDiameter ** 2) / 4;
-  const VolAirTotalX = CONSTANTS.HeatCapacityRatioAir * CONSTANTS.Patm * (AreaAir ** 2) / kAirSpringX;
-  const VolAirTotalY = CONSTANTS.HeatCapacityRatioAir * CONSTANTS.Patm * (AreaAir ** 2) / kAirSpringY;
+  console.log(
+    "massUsefulX, kGravityX, kAirSpringX, kTotalX = ",
+    massUsefulX,
+    kGravityX,
+    kAirSpringX,
+    kTotalX
+  );
+  console.log(
+    "massUsefulY, kGravityY, kAirSpringY, kTotalY = ",
+    massUsefulY,
+    kGravityY,
+    kAirSpringY,
+    kTotalY
+  );
 
-  const VolAirInsideWaterCylX = CONSTANTS.AdditionalLongitudinalClearance / 2 * AreaCenter + MembrangeLengthX * (AreaCenter - AreaMemHor);
-  const VolAirInsideWaterCylY = CONSTANTS.AdditionalLongitudinalClearance / 2 * AreaCenter + MembrangeLengthY * (AreaCenter - AreaMemHor);
+  const AreaAir = (Math.PI * CONSTANTS.CylDiameter ** 2) / 4;
+  const VolAirTotalX =
+    (CONSTANTS.HeatCapacityRatioAir * CONSTANTS.Patm * AreaAir ** 2) /
+    kAirSpringX;
+  const VolAirTotalY =
+    (CONSTANTS.HeatCapacityRatioAir * CONSTANTS.Patm * AreaAir ** 2) /
+    kAirSpringY;
+
+  const VolAirInsideWaterCylX =
+    (CONSTANTS.AdditionalLongitudinalClearance / 2) * AreaCenter +
+    MembrangeLengthX * (AreaCenter - AreaMemHor);
+  const VolAirInsideWaterCylY =
+    (CONSTANTS.AdditionalLongitudinalClearance / 2) * AreaCenter +
+    MembrangeLengthY * (AreaCenter - AreaMemHor);
 
   const VolAirCylX = VolAirTotalX - VolAirInsideWaterCylX;
   const VolAirCylY = VolAirTotalY - VolAirInsideWaterCylY;
 
   const EachAirCylLengthX = VolAirCylX / AreaAir;
   const EachAirCylLengthY = VolAirCylY / AreaAir;
+
+  console.log(
+    "AreaAir, VolAirTotalX, VolAirInsideWaterCylX, VolAirCylX, EachAirCylLengthX = ",
+    AreaAir,
+    VolAirTotalX,
+    VolAirInsideWaterCylX,
+    VolAirCylX,
+    EachAirCylLengthX
+  );
+  console.log(
+    "AreaAir, VolAirTotalY, VolAirInsideWaterCylY, VolAirCylY, EachAirCylLengthY = ",
+    AreaAir,
+    VolAirTotalY,
+    VolAirInsideWaterCylY,
+    VolAirCylY,
+    EachAirCylLengthY
+  );
 
   const ExactNumWaterCylindersX = totalUsefulWaterMassX / massUsefulX;
   const ExactNumWaterCylindersY = totalUsefulWaterMassY / massUsefulY;
@@ -279,6 +406,22 @@ const BldgDynamics = (
   const RoundUpNumAirCylindersX = Math.ceil(ExactNumAirCylindersX);
   const RoundUpNumAirCylindersY = Math.ceil(ExactNumAirCylindersY);
 
+  console.log(
+    "ExactNumWaterCylindersX, RoundUpNumWaterCylindersX, TotalLengthAirCylinderX, ExactNumAirCylindersX, RoundUpNumAirCylindersX = ",
+    ExactNumWaterCylindersX,
+    RoundUpNumWaterCylindersX,
+    TotalLengthAirCylinderX,
+    ExactNumAirCylindersX,
+    RoundUpNumAirCylindersX
+  );
+  console.log(
+    "ExactNumWaterCylindersY, RoundUpNumWaterCylindersY, TotalLengthAirCylinderY, ExactNumAirCylindersY, RoundUpNumAirCylindersY = ",
+    ExactNumWaterCylindersY,
+    RoundUpNumWaterCylindersY,
+    TotalLengthAirCylinderY,
+    ExactNumAirCylindersY,
+    RoundUpNumAirCylindersY
+  );
 
   // Return
   return {
