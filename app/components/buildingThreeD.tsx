@@ -2,8 +2,7 @@
 
 import { OrbitControls } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
-import { useState, useMemo, useRef } from "react";
-import * as THREE from 'three';
+import { useState } from "react";
 
 
 
@@ -21,7 +20,7 @@ function Box(props: BuildingDimensions) {
     <mesh
     {...props}
     scale={clicked ? 1.5 : 1}
-    onClick={(event) => click(!clicked)}
+    onClick={() => click(!clicked)}
   >
       <boxGeometry args={[props.xWidth, props.height, props.yWidth, 1, props.numFLoors, 1]} />
       <meshStandardMaterial wireframe color={clicked ? "hotpink" : "orange"} />

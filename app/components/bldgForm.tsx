@@ -13,6 +13,7 @@ import MenuItem from "@mui/material/MenuItem";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { useState } from "react";
+import { building_properties, damper_properties, output_properties, BldgDynamics } from "../calcs/calcs";
 
 interface UnitSytem {
   force?: string
@@ -49,6 +50,16 @@ const BuildingDesign = (units: UnitSytem) => {
 
   const [yModalMassChecked, setyModalMassChecked] = useState(true);
   const [yModalMass, setyModalMass] = useState(2000);
+
+  // Calcs
+  const bldgProps: building_properties = {
+    N: numFloors,
+    H: bldgHeight,
+    BX: bldgXwidth,
+    BY: bldgYwidth,
+    units: 1,
+    S: 1
+  };
 
   return (
     <Box sx={{ width: "100%" }}>
@@ -405,6 +416,20 @@ const DamperPerformance = (units: UnitSytem) => {
   const [yTotalDamping, setyTotalDamping] = useState(1.2);
   const [moduleLength, setmoduleLength] = useState(20);
   const [moduleWidth, setmoduleWidth] = useState(8);
+
+  const damperProps: damper_properties = {
+    LocX : 1,
+    LocY : 2,
+    ModL : moduleLength,
+    ModW : moduleWidth,
+    AccRedX : xAccelReduction,
+    AccRedY : yAccelReduction,
+    ZetaTotalX : xTotalDamping,
+    ZetaTotalY : yTotalDamping,
+    OptionX : true,
+    OptionY : true
+  };
+
 
   return (
     <Box sx={{ width: "100%" }}>
