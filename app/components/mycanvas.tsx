@@ -15,16 +15,17 @@ interface TabPanelProps {
 function TabPanel(props: TabPanelProps) {
   const { children, value, index, ...other } = props;
 
+  const boxStyle = {"height": "100%", "maxHeight": "600px", "padding": "10px"};
   return (
     <div
       role="tabpanel"
       hidden={value !== index}
       id={`full-width-tabpanel-${index}`}
       aria-labelledby={`full-width-tab-${index}`}
-      style={{height: "600px"}}
+      style={ boxStyle }
       {...other}
     >
-      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
+      {value === index && <Box style={ boxStyle }>{children}</Box>}
     </div>
   );
 }
@@ -40,7 +41,7 @@ const MyCanvas = () => {
   const [value, setValue] = React.useState(0);
 
   return (
-    <Card sx={{ height: "100%", bgcolor: "#FFFFFA" }}>
+    <Card  style={{height:'100%'}}>
       <Tabs
         value={value}
         onChange={(e, newValue: number) => {
