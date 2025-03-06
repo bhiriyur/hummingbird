@@ -14,8 +14,8 @@ import TextField from "@mui/material/TextField";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 
-import { useState } from "react";
-// import { building_properties, damper_properties } from "../calcs/calcs";
+import { useEffect, useState } from "react";
+import * as calcs from "../calcs/calcs";
 
 interface UnitSytem {
   force?: string;
@@ -28,15 +28,40 @@ const INPUTSCOLOR = "#FEFEFE";
 const OVERRIDESCOLOR = "#F5F5F5";
 const BGCOLOR = "#FEFEFE";
 
+const bldgProps: calcs.building_properties = {
+  N: 42,
+  BX: 40,
+  BY: 40,
+  H: 450,
+};
+
+const damperProps: calcs.damper_properties = {
+  LocX: 1,
+  LocY: 2,
+  ModL: 40,
+  ModW: 8,
+  AccRedX: 40,
+  AccRedY: 30,
+  ZetaTotalX: 2.5,
+  ZetaTotalY: 2.5,
+  OptionX: true,
+  OptionY: true,
+};
+
+const recalculate = () => {
+  console.log("Recalculating...");
+  return calcs.BldgDynamics(bldgProps, damperProps);
+};
+
 const BuildingDesign = (units: UnitSytem) => {
-  const [numFloors, setNumFloors] = useState(42);
-  const [bldgHeight, setbldgHeight] = useState(450);
-  const [bldgXwidth, setbldgXwidth] = useState(80);
-  const [bldgYwidth, setbldgYwidth] = useState(55);
+  const [numFloors, setNumFloors] = useState(bldgProps.N);
+  const [bldgHeight, setbldgHeight] = useState(bldgProps.H);
+  const [bldgXwidth, setbldgXwidth] = useState(bldgProps.BX);
+  const [bldgYwidth, setbldgYwidth] = useState(bldgProps.BY);
   const systems = [
-    "Modules only (steel moment-resisting frame)",
-    "Modules + Steel branced frame",
-    "Modules + Concrete shear walls",
+    "Steel moment-resisting frame",
+    "Steel braced frame",
+    "Concrete shear walls",
   ];
   const [bldgSystem, setbldgSystem] = useState(systems[0]);
 
@@ -60,6 +85,45 @@ const BuildingDesign = (units: UnitSytem) => {
   const [yModalMassChecked, setyModalMassChecked] = useState(true);
   const [yModalMass, setyModalMass] = useState(2000);
 
+  useEffect(() => {
+    console.log("UseEffect Rerender");
+    const systems = [
+      "Steel moment-resisting frame",
+      "Steel braced frame",
+      "Concrete shear walls",
+    ];    
+    const changeBuilding = () => {
+      bldgProps.N = numFloors;
+      bldgProps.H = bldgHeight;
+      bldgProps.BX = bldgXwidth;
+      bldgProps.BY = bldgYwidth;
+      bldgProps.S = systems.indexOf(bldgSystem) + 1;
+
+      console.log("BUILDING CHANGED: ", bldgProps);
+      const outputs = recalculate();
+
+      if (xPeriodChecked) setxPeriod(Math.round(outputs.TX * 1e3) / 1e3);
+      if (yPeriodChecked) setyPeriod(Math.round(outputs.TY * 1e3) / 1e3);
+      if (xIntrinsicDampingChecked) setxIntrinsicDamping(outputs.ZetaX * 100);
+      if (yIntrinsicDampingChecked) setyIntrinsicDamping(outputs.ZetaY * 100);
+      if (xModalMassChecked) setxModalMass(outputs.WX / 1000);
+      if (yModalMassChecked) setyModalMass(outputs.WY / 1000);
+    };
+    changeBuilding();
+  }, [
+    numFloors,
+    bldgHeight,
+    bldgXwidth,
+    bldgYwidth,
+    bldgSystem,
+    xPeriodChecked,
+    yPeriodChecked,
+    xIntrinsicDampingChecked,
+    yIntrinsicDampingChecked,
+    xModalMassChecked,
+    yModalMassChecked,
+  ]);
+
   return (
     <Box sx={{ width: "100%" }}>
       <Grid container rowSpacing={2} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
@@ -69,6 +133,7 @@ const BuildingDesign = (units: UnitSytem) => {
             fullWidth
             value={numFloors}
             onChange={(e) => {
+              console.log(e.target.value);
               setNumFloors(Number(e.target.value));
             }}
             id="bldgFloors"
@@ -149,9 +214,6 @@ const BuildingDesign = (units: UnitSytem) => {
             select={true}
             value={bldgSystem}
             onChange={(e) => {
-              console.log(e);
-              console.log(e.target.value);
-              console.log(bldgSystem);
               setbldgSystem(e.target.value);
             }}
             id="bldgStructuralSystem"
@@ -469,6 +531,21 @@ const DamperPerformance = (units: UnitSytem) => {
   const [xOption, setXOption] = useState(false);
   const [yOption, setYOption] = useState(false);
 
+  const changeDamper = () => {
+    damperProps.LocX = 1;
+    damperProps.LocY = 1;
+    damperProps.ModL = moduleLength;
+    damperProps.ModW = moduleWidth;
+    damperProps.AccRedX = xAccelReduction;
+    damperProps.AccRedY = yAccelReduction;
+    damperProps.ZetaTotalX = xTotalDamping;
+    damperProps.ZetaTotalY = yTotalDamping;
+    damperProps.OptionX = xOption;
+    damperProps.OptionY = yOption;
+
+    console.log("DAMPER CHANGED: ", damperProps);
+  };
+
   return (
     <Box sx={{ width: "100%" }}>
       <Grid container rowSpacing={2} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
@@ -480,6 +557,7 @@ const DamperPerformance = (units: UnitSytem) => {
             value={xDamperLocation}
             onChange={(e) => {
               setxDamperLocation(e.target.value);
+              changeDamper();
             }}
             id="damperLocationX"
             label="X-Damper Location"
