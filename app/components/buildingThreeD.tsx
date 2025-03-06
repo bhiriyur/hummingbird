@@ -2,7 +2,6 @@
 
 import { Edges, OrbitControls } from "@react-three/drei";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { useState } from "react";
 import { PerspectiveCamera } from "three";
 
 interface BuildingDimensions {
@@ -16,10 +15,13 @@ function CameraLogger() {
   const { camera } = useThree();
 
   useFrame(() => {
-    if (camera! instanceof PerspectiveCamera) {
+    // if (camera instanceof PerspectiveCamera) {
       const position = camera.position.clone();
-      console.log("Camera Position:", position);
-    }
+      console.log('POS: ', camera, position)
+      // Get the current FOV
+      // const fov = camera.position.fov;
+    // console.log('Current FOV:', fov);      console.log("Camera Position:", position);
+    // }
   });
 
   return null;
@@ -60,7 +62,7 @@ const BuildingThreeD = (props: BuildingDimensions) => {
       <Canvas
         orthographic
         camera={{
-          position: [4 * BX, 1 * BY, 8 * BZ],
+          position: [2.5 * BX, 1.1 * BY, 10 * BZ],
         }}
         style={{
           width: "100%",
@@ -71,7 +73,7 @@ const BuildingThreeD = (props: BuildingDimensions) => {
         <ambientLight intensity={Math.PI / 2} />
         <Box {...props} />
         <axesHelper args={[5]} />
-        <CameraLogger />
+        {/* <CameraLogger /> */}
         <OrbitControls />
       </Canvas>
     </div>

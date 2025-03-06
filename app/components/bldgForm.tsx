@@ -11,7 +11,9 @@ import IconButton from "@mui/material/IconButton";
 import InputAdornment from "@mui/material/InputAdornment";
 import MenuItem from "@mui/material/MenuItem";
 import TextField from "@mui/material/TextField";
+import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
+
 import { useState } from "react";
 // import { building_properties, damper_properties } from "../calcs/calcs";
 
@@ -25,7 +27,6 @@ const VARIANT = "filled";
 const INPUTSCOLOR = "white";
 const OVERRIDESCOLOR = "#EEE";
 
-
 const BuildingDesign = (units: UnitSytem) => {
   const [numFloors, setNumFloors] = useState(42);
   const [bldgHeight, setbldgHeight] = useState(450);
@@ -34,7 +35,7 @@ const BuildingDesign = (units: UnitSytem) => {
   const systems = [
     "Modules only (steel moment-resisting frame)",
     "Modules + Steel branced frame",
-    "Modules + Concrete shear walls"
+    "Modules + Concrete shear walls",
   ];
   const [bldgSystem, setbldgSystem] = useState(systems[0]);
 
@@ -73,7 +74,7 @@ const BuildingDesign = (units: UnitSytem) => {
             label="Number of Floors"
             variant={VARIANT}
             type="number"
-            style={{"backgroundColor": INPUTSCOLOR}}
+            style={{ backgroundColor: INPUTSCOLOR }}
           ></TextField>
         </Grid>
         <Grid size={3}>
@@ -87,7 +88,7 @@ const BuildingDesign = (units: UnitSytem) => {
             label="Building Height"
             variant={VARIANT}
             type="number"
-            style={{"backgroundColor": INPUTSCOLOR}}
+            style={{ backgroundColor: INPUTSCOLOR }}
             slotProps={{
               input: {
                 endAdornment: (
@@ -108,7 +109,7 @@ const BuildingDesign = (units: UnitSytem) => {
             label="X Width"
             variant={VARIANT}
             type="number"
-            style={{"backgroundColor": INPUTSCOLOR}}
+            style={{ backgroundColor: INPUTSCOLOR }}
             slotProps={{
               input: {
                 endAdornment: (
@@ -129,7 +130,7 @@ const BuildingDesign = (units: UnitSytem) => {
             label="Y Width"
             variant={VARIANT}
             type="number"
-            style={{"backgroundColor": INPUTSCOLOR}}
+            style={{ backgroundColor: INPUTSCOLOR }}
             slotProps={{
               input: {
                 endAdornment: (
@@ -155,7 +156,7 @@ const BuildingDesign = (units: UnitSytem) => {
             id="bldgStructuralSystem"
             label="Structural System"
             variant={VARIANT}
-            style={{"backgroundColor": INPUTSCOLOR}}
+            style={{ backgroundColor: INPUTSCOLOR }}
           >
             {systems.map((system) => (
               <MenuItem key={system} value={system}>
@@ -177,8 +178,10 @@ const BuildingDesign = (units: UnitSytem) => {
             label="X-Period"
             variant={VARIANT}
             type="number"
-            style={{backgroundColor: xPeriodChecked ? OVERRIDESCOLOR : INPUTSCOLOR}}            
-            slotProps={{              
+            style={{
+              backgroundColor: xPeriodChecked ? OVERRIDESCOLOR : INPUTSCOLOR,
+            }}
+            slotProps={{
               input: {
                 readOnly: xPeriodChecked ? true : false,
                 endAdornment: (
@@ -186,20 +189,22 @@ const BuildingDesign = (units: UnitSytem) => {
                 ),
                 startAdornment: (
                   <InputAdornment position="start">
-                    <IconButton
-                      aria-label={xPeriodChecked ? "Default" : "Override"}
-                      onClick={() => {
-                        setxPeriodChecked(!xPeriodChecked);
-                      }}
-                      edge="start"
-                      size="small"
-                    >
-                      {xPeriodChecked ? (
-                        <CheckBoxOutlined />
-                      ) : (
-                        <CheckBoxOutlineBlank />
-                      )}
-                    </IconButton>
+                    <Tooltip title="Auto-compute value if checked">
+                      <IconButton
+                        aria-label={xPeriodChecked ? "Default" : "Override"}
+                        onClick={() => {
+                          setxPeriodChecked(!xPeriodChecked);
+                        }}
+                        edge="start"
+                        size="small"
+                      >
+                        {xPeriodChecked ? (
+                          <CheckBoxOutlined />
+                        ) : (
+                          <CheckBoxOutlineBlank />
+                        )}
+                      </IconButton>
+                    </Tooltip>
                   </InputAdornment>
                 ),
               },
@@ -207,44 +212,56 @@ const BuildingDesign = (units: UnitSytem) => {
           ></TextField>
         </Grid>
         <Grid size={4}>
-          <TextField
-            fullWidth
-            value={xIntrinsicDamping}
-            onChange={(e) => {
-              setxIntrinsicDamping(Number(e.target.value));
-            }}
-            id="intrinsicDampingX"
-            label="X-Intrinsic Damping"
-            variant={VARIANT}
-            style={{backgroundColor: xIntrinsicDampingChecked ? OVERRIDESCOLOR : INPUTSCOLOR}}            
-            type="number"
-            slotProps={{
-              input: {
-                readOnly: xIntrinsicDampingChecked ? true : false,
-                endAdornment: <InputAdornment position="end">%</InputAdornment>,
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <IconButton
-                      aria-label={
-                        xIntrinsicDampingChecked ? "Default" : "Override"
-                      }
-                      onClick={() => {
-                        setxIntrinsicDampingChecked(!xIntrinsicDampingChecked);
-                      }}
-                      edge="start"
-                      size="small"
-                    >
-                      {xIntrinsicDampingChecked ? (
-                        <CheckBoxOutlined />
-                      ) : (
-                        <CheckBoxOutlineBlank />
-                      )}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              },
-            }}
-          ></TextField>
+          <Tooltip title="% of critical">
+            <TextField
+              fullWidth
+              value={xIntrinsicDamping}
+              onChange={(e) => {
+                setxIntrinsicDamping(Number(e.target.value));
+              }}
+              id="intrinsicDampingX"
+              label="X-Intrinsic Damping"
+              variant={VARIANT}
+              style={{
+                backgroundColor: xIntrinsicDampingChecked
+                  ? OVERRIDESCOLOR
+                  : INPUTSCOLOR,
+              }}
+              type="number"
+              slotProps={{
+                input: {
+                  readOnly: xIntrinsicDampingChecked ? true : false,
+                  endAdornment: (
+                    <InputAdornment position="end">%</InputAdornment>
+                  ),
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Tooltip title="Auto-compute value if checked">
+                        <IconButton
+                          aria-label={
+                            xIntrinsicDampingChecked ? "Default" : "Override"
+                          }
+                          onClick={() => {
+                            setxIntrinsicDampingChecked(
+                              !xIntrinsicDampingChecked
+                            );
+                          }}
+                          edge="start"
+                          size="small"
+                        >
+                          {xIntrinsicDampingChecked ? (
+                            <CheckBoxOutlined />
+                          ) : (
+                            <CheckBoxOutlineBlank />
+                          )}
+                        </IconButton>
+                      </Tooltip>
+                    </InputAdornment>
+                  ),
+                },
+              }}
+            ></TextField>
+          </Tooltip>
         </Grid>
         <Grid size={4}>
           <TextField
@@ -256,7 +273,9 @@ const BuildingDesign = (units: UnitSytem) => {
             id="modalMassX"
             label="X-Modal Mass"
             variant={VARIANT}
-            style={{backgroundColor: xModalMassChecked ? OVERRIDESCOLOR : INPUTSCOLOR}}            
+            style={{
+              backgroundColor: xModalMassChecked ? OVERRIDESCOLOR : INPUTSCOLOR,
+            }}
             type="number"
             slotProps={{
               input: {
@@ -266,20 +285,22 @@ const BuildingDesign = (units: UnitSytem) => {
                 ),
                 startAdornment: (
                   <InputAdornment position="start">
-                    <IconButton
-                      aria-label={xModalMassChecked ? "Default" : "Override"}
-                      onClick={() => {
-                        setxModalMassChecked(!xModalMassChecked);
-                      }}
-                      edge="start"
-                      size="small"
-                    >
-                      {xModalMassChecked ? (
-                        <CheckBoxOutlined />
-                      ) : (
-                        <CheckBoxOutlineBlank />
-                      )}
-                    </IconButton>
+                    <Tooltip title="Auto-compute value if checked">
+                      <IconButton
+                        aria-label={xModalMassChecked ? "Default" : "Override"}
+                        onClick={() => {
+                          setxModalMassChecked(!xModalMassChecked);
+                        }}
+                        edge="start"
+                        size="small"
+                      >
+                        {xModalMassChecked ? (
+                          <CheckBoxOutlined />
+                        ) : (
+                          <CheckBoxOutlineBlank />
+                        )}
+                      </IconButton>
+                    </Tooltip>
                   </InputAdornment>
                 ),
               },
@@ -298,7 +319,9 @@ const BuildingDesign = (units: UnitSytem) => {
             id="periodY"
             label="Y-Period"
             variant={VARIANT}
-            style={{backgroundColor: yPeriodChecked ? OVERRIDESCOLOR : INPUTSCOLOR}}            
+            style={{
+              backgroundColor: yPeriodChecked ? OVERRIDESCOLOR : INPUTSCOLOR,
+            }}
             type="number"
             slotProps={{
               input: {
@@ -308,20 +331,22 @@ const BuildingDesign = (units: UnitSytem) => {
                 ),
                 startAdornment: (
                   <InputAdornment position="start">
-                    <IconButton
-                      aria-label={yPeriodChecked ? "Default" : "Override"}
-                      onClick={() => {
-                        setyPeriodChecked(!yPeriodChecked);
-                      }}
-                      edge="start"
-                      size="small"
-                    >
-                      {yPeriodChecked ? (
-                        <CheckBoxOutlined />
-                      ) : (
-                        <CheckBoxOutlineBlank />
-                      )}
-                    </IconButton>
+                    <Tooltip title="Auto-compute value if checked">
+                      <IconButton
+                        aria-label={yPeriodChecked ? "Default" : "Override"}
+                        onClick={() => {
+                          setyPeriodChecked(!yPeriodChecked);
+                        }}
+                        edge="start"
+                        size="small"
+                      >
+                        {yPeriodChecked ? (
+                          <CheckBoxOutlined />
+                        ) : (
+                          <CheckBoxOutlineBlank />
+                        )}
+                      </IconButton>
+                    </Tooltip>
                   </InputAdornment>
                 ),
               },
@@ -329,44 +354,56 @@ const BuildingDesign = (units: UnitSytem) => {
           ></TextField>
         </Grid>
         <Grid size={4}>
-          <TextField
-            fullWidth
-            value={yIntrinsicDamping}
-            onChange={(e) => {
-              setyIntrinsicDamping(Number(e.target.value));
-            }}
-            id="intrinsicDampingY"
-            label="Y-Intrinsic Damping"
-            variant={VARIANT}
-            style={{backgroundColor: yIntrinsicDampingChecked ? OVERRIDESCOLOR : INPUTSCOLOR}}            
-            type="number"
-            slotProps={{
-              input: {
-                readOnly: yIntrinsicDampingChecked ? true : false,
-                endAdornment: <InputAdornment position="end">%</InputAdornment>,
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <IconButton
-                      aria-label={
-                        yIntrinsicDampingChecked ? "Default" : "Override"
-                      }
-                      onClick={() => {
-                        setyIntrinsicDampingChecked(!yIntrinsicDampingChecked);
-                      }}
-                      edge="start"
-                      size="small"
-                    >
-                      {yIntrinsicDampingChecked ? (
-                        <CheckBoxOutlined />
-                      ) : (
-                        <CheckBoxOutlineBlank />
-                      )}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              },
-            }}
-          ></TextField>
+          <Tooltip title="% of critical">
+            <TextField
+              fullWidth
+              value={yIntrinsicDamping}
+              onChange={(e) => {
+                setyIntrinsicDamping(Number(e.target.value));
+              }}
+              id="intrinsicDampingY"
+              label="Y-Intrinsic Damping"
+              variant={VARIANT}
+              style={{
+                backgroundColor: yIntrinsicDampingChecked
+                  ? OVERRIDESCOLOR
+                  : INPUTSCOLOR,
+              }}
+              type="number"
+              slotProps={{
+                input: {
+                  readOnly: yIntrinsicDampingChecked ? true : false,
+                  endAdornment: (
+                    <InputAdornment position="end">%</InputAdornment>
+                  ),
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Tooltip title="Auto-compute value if checked">
+                        <IconButton
+                          aria-label={
+                            yIntrinsicDampingChecked ? "Default" : "Override"
+                          }
+                          onClick={() => {
+                            setyIntrinsicDampingChecked(
+                              !yIntrinsicDampingChecked
+                            );
+                          }}
+                          edge="start"
+                          size="small"
+                        >
+                          {yIntrinsicDampingChecked ? (
+                            <CheckBoxOutlined />
+                          ) : (
+                            <CheckBoxOutlineBlank />
+                          )}
+                        </IconButton>
+                      </Tooltip>
+                    </InputAdornment>
+                  ),
+                },
+              }}
+            ></TextField>
+          </Tooltip>
         </Grid>
         <Grid size={4}>
           <TextField
@@ -378,7 +415,9 @@ const BuildingDesign = (units: UnitSytem) => {
             id="modalMassY"
             label="Y-Modal Mass"
             variant={VARIANT}
-            style={{backgroundColor: yModalMassChecked ? OVERRIDESCOLOR : INPUTSCOLOR}}            
+            style={{
+              backgroundColor: yModalMassChecked ? OVERRIDESCOLOR : INPUTSCOLOR,
+            }}
             type="number"
             slotProps={{
               input: {
@@ -388,20 +427,22 @@ const BuildingDesign = (units: UnitSytem) => {
                 ),
                 startAdornment: (
                   <InputAdornment position="start">
-                    <IconButton
-                      aria-label={yModalMassChecked ? "Default" : "Override"}
-                      onClick={() => {
-                        setyModalMassChecked(!yModalMassChecked);
-                      }}
-                      edge="start"
-                      size="small"
-                    >
-                      {yModalMassChecked ? (
-                        <CheckBoxOutlined />
-                      ) : (
-                        <CheckBoxOutlineBlank />
-                      )}
-                    </IconButton>
+                    <Tooltip title="Auto-compute value if checked">
+                      <IconButton
+                        aria-label={yModalMassChecked ? "Default" : "Override"}
+                        onClick={() => {
+                          setyModalMassChecked(!yModalMassChecked);
+                        }}
+                        edge="start"
+                        size="small"
+                      >
+                        {yModalMassChecked ? (
+                          <CheckBoxOutlined />
+                        ) : (
+                          <CheckBoxOutlineBlank />
+                        )}
+                      </IconButton>
+                    </Tooltip>
                   </InputAdornment>
                 ),
               },
@@ -441,7 +482,7 @@ const DamperPerformance = (units: UnitSytem) => {
             }}
             id="damperLocationX"
             label="X-Damper Location"
-            style={{backgroundColor: INPUTSCOLOR}}            
+            style={{ backgroundColor: INPUTSCOLOR }}
             variant={VARIANT}
           >
             {systems.map((system) => (
@@ -461,7 +502,7 @@ const DamperPerformance = (units: UnitSytem) => {
             id="acclReductionX"
             label="X-Accln. Reduction"
             variant={VARIANT}
-            style={{backgroundColor: xOption ? OVERRIDESCOLOR : INPUTSCOLOR}}            
+            style={{ backgroundColor: xOption ? OVERRIDESCOLOR : INPUTSCOLOR }}
             type="number"
             slotProps={{
               input: {
@@ -477,7 +518,11 @@ const DamperPerformance = (units: UnitSytem) => {
                       edge="start"
                       size="small"
                     >
-                      { xOption ?  <CheckBoxOutlined /> : <CheckBoxOutlineBlank /> }
+                      {xOption ? (
+                        <CheckBoxOutlined />
+                      ) : (
+                        <CheckBoxOutlineBlank />
+                      )}
                     </IconButton>
                   </InputAdornment>
                 ),
@@ -495,7 +540,7 @@ const DamperPerformance = (units: UnitSytem) => {
             }}
             label="X-Total Damping"
             variant={VARIANT}
-            style={{backgroundColor: !xOption ? OVERRIDESCOLOR : INPUTSCOLOR}}            
+            style={{ backgroundColor: !xOption ? OVERRIDESCOLOR : INPUTSCOLOR }}
             type="number"
             slotProps={{
               input: {
@@ -511,7 +556,11 @@ const DamperPerformance = (units: UnitSytem) => {
                       edge="start"
                       size="small"
                     >
-                      { xOption ?  <CheckBoxOutlineBlank /> : <CheckBoxOutlined /> }
+                      {xOption ? (
+                        <CheckBoxOutlineBlank />
+                      ) : (
+                        <CheckBoxOutlined />
+                      )}
                     </IconButton>
                   </InputAdornment>
                 ),
@@ -531,7 +580,7 @@ const DamperPerformance = (units: UnitSytem) => {
             }}
             id="damperLocationY"
             label="Y-Damper Location"
-            style={{backgroundColor: INPUTSCOLOR}}            
+            style={{ backgroundColor: INPUTSCOLOR }}
             variant={VARIANT}
           >
             {systems.map((system) => (
@@ -551,7 +600,7 @@ const DamperPerformance = (units: UnitSytem) => {
             id="acclReductionY"
             label="Y-Accln. Reduction"
             variant={VARIANT}
-            style={{backgroundColor: yOption ? OVERRIDESCOLOR : INPUTSCOLOR}}            
+            style={{ backgroundColor: yOption ? OVERRIDESCOLOR : INPUTSCOLOR }}
             type="number"
             slotProps={{
               input: {
@@ -567,7 +616,11 @@ const DamperPerformance = (units: UnitSytem) => {
                       edge="start"
                       size="small"
                     >
-                      { yOption ?  <CheckBoxOutlined /> : <CheckBoxOutlineBlank /> }
+                      {yOption ? (
+                        <CheckBoxOutlined />
+                      ) : (
+                        <CheckBoxOutlineBlank />
+                      )}
                     </IconButton>
                   </InputAdornment>
                 ),
@@ -585,7 +638,7 @@ const DamperPerformance = (units: UnitSytem) => {
             id="totalDampingY"
             label="Y-Total Damping"
             variant={VARIANT}
-            style={{backgroundColor: !yOption ? OVERRIDESCOLOR : INPUTSCOLOR}}            
+            style={{ backgroundColor: !yOption ? OVERRIDESCOLOR : INPUTSCOLOR }}
             type="number"
             slotProps={{
               input: {
@@ -601,7 +654,11 @@ const DamperPerformance = (units: UnitSytem) => {
                       edge="start"
                       size="small"
                     >
-                      { yOption ?  <CheckBoxOutlineBlank /> : <CheckBoxOutlined /> }
+                      {yOption ? (
+                        <CheckBoxOutlineBlank />
+                      ) : (
+                        <CheckBoxOutlined />
+                      )}
                     </IconButton>
                   </InputAdornment>
                 ),
@@ -622,7 +679,7 @@ const DamperPerformance = (units: UnitSytem) => {
             label="Module Length"
             variant={VARIANT}
             type="number"
-            style={{backgroundColor: INPUTSCOLOR}}            
+            style={{ backgroundColor: INPUTSCOLOR }}
             slotProps={{
               input: {
                 endAdornment: (
@@ -642,7 +699,7 @@ const DamperPerformance = (units: UnitSytem) => {
             id="moduleWidth"
             label="Module Width"
             variant={VARIANT}
-            style={{backgroundColor: INPUTSCOLOR}}            
+            style={{ backgroundColor: INPUTSCOLOR }}
             type="number"
             slotProps={{
               input: {
