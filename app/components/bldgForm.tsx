@@ -53,283 +53,6 @@ const recalculate = () => {
   return calcs.BldgDynamics(bldgProps, damperProps);
 };
 
-const DamperPerformance = (units: UnitSytem) => {
-  const systems = ["On Roof", "In Modules"];
-  const [xDamperLocation, setxDamperLocation] = useState(systems[0]);
-  const [yDamperLocation, setyDamperLocation] = useState(systems[1]);
-  const [xAccelReduction, setxAccelReduction] = useState(40);
-  const [yAccelReduction, setyAccelReduction] = useState(30);
-  const [xTotalDamping, setxTotalDamping] = useState(1.5);
-  const [yTotalDamping, setyTotalDamping] = useState(1.2);
-  const [moduleLength, setmoduleLength] = useState(20);
-  const [moduleWidth, setmoduleWidth] = useState(8);
-
-  const [xOption, setXOption] = useState(false);
-  const [yOption, setYOption] = useState(false);
-
-  const changeDamper = () => {
-    damperProps.LocX = 1;
-    damperProps.LocY = 1;
-    damperProps.ModL = moduleLength;
-    damperProps.ModW = moduleWidth;
-    damperProps.AccRedX = xAccelReduction;
-    damperProps.AccRedY = yAccelReduction;
-    damperProps.ZetaTotalX = xTotalDamping;
-    damperProps.ZetaTotalY = yTotalDamping;
-    damperProps.OptionX = xOption;
-    damperProps.OptionY = yOption;
-
-    console.log("DAMPER CHANGED: ", damperProps);
-  };
-
-  return (
-    <Box sx={{ width: "100%" }}>
-      <Grid container rowSpacing={2} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
-        {/* X Damper */}
-        <Grid size={4}>
-          <TextField
-            fullWidth
-            select
-            value={xDamperLocation}
-            onChange={(e) => {
-              setxDamperLocation(e.target.value);
-              changeDamper();
-            }}
-            id="damperLocationX"
-            label="X-Damper Location"
-            style={{ backgroundColor: INPUTSCOLOR }}
-            variant={VARIANT}
-          >
-            {systems.map((system) => (
-              <MenuItem key={system} value={system}>
-                {system}
-              </MenuItem>
-            ))}
-          </TextField>
-        </Grid>
-        <Grid size={4}>
-          <TextField
-            fullWidth
-            value={xAccelReduction}
-            onChange={(e) => {
-              setxAccelReduction(Number(e.target.value));
-            }}
-            id="acclReductionX"
-            label="X-Accln. Reduction"
-            variant={VARIANT}
-            style={{ backgroundColor: xOption ? OVERRIDESCOLOR : INPUTSCOLOR }}
-            type="number"
-            slotProps={{
-              input: {
-                readOnly: xOption ? true : false,
-                endAdornment: <InputAdornment position="end">%</InputAdornment>,
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <IconButton
-                      aria-label={xOption ? "Default" : "Override"}
-                      onClick={() => {
-                        setXOption(!xOption);
-                      }}
-                      edge="start"
-                      size="small"
-                    >
-                      {xOption ? (
-                        <CheckBoxOutlined />
-                      ) : (
-                        <CheckBoxOutlineBlank />
-                      )}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              },
-            }}
-          ></TextField>
-        </Grid>
-        <Grid size={4}>
-          <TextField
-            fullWidth
-            value={xTotalDamping}
-            id="totalDampingX"
-            onChange={(e) => {
-              setxTotalDamping(Number(e.target.value));
-            }}
-            label="X-Total Damping"
-            variant={VARIANT}
-            style={{ backgroundColor: !xOption ? OVERRIDESCOLOR : INPUTSCOLOR }}
-            type="number"
-            slotProps={{
-              input: {
-                readOnly: !xOption ? true : false,
-                endAdornment: <InputAdornment position="end">%</InputAdornment>,
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <IconButton
-                      aria-label={xOption ? "Default" : "Override"}
-                      onClick={() => {
-                        setXOption(!xOption);
-                      }}
-                      edge="start"
-                      size="small"
-                    >
-                      {xOption ? (
-                        <CheckBoxOutlineBlank />
-                      ) : (
-                        <CheckBoxOutlined />
-                      )}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              },
-            }}
-          ></TextField>
-        </Grid>
-
-        {/* Y Damper */}
-        <Grid size={4}>
-          <TextField
-            fullWidth
-            select
-            value={yDamperLocation}
-            onChange={(e) => {
-              setyDamperLocation(e.target.value);
-            }}
-            id="damperLocationY"
-            label="Y-Damper Location"
-            style={{ backgroundColor: INPUTSCOLOR }}
-            variant={VARIANT}
-          >
-            {systems.map((system) => (
-              <MenuItem key={system} value={system}>
-                {system}
-              </MenuItem>
-            ))}
-          </TextField>
-        </Grid>
-        <Grid size={4}>
-          <TextField
-            fullWidth
-            value={yAccelReduction}
-            onChange={(e) => {
-              setyAccelReduction(Number(e.target.value));
-            }}
-            id="acclReductionY"
-            label="Y-Accln. Reduction"
-            variant={VARIANT}
-            style={{ backgroundColor: yOption ? OVERRIDESCOLOR : INPUTSCOLOR }}
-            type="number"
-            slotProps={{
-              input: {
-                readOnly: yOption ? true : false,
-                endAdornment: <InputAdornment position="end">%</InputAdornment>,
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <IconButton
-                      aria-label={yOption ? "Default" : "Override"}
-                      onClick={() => {
-                        setYOption(!yOption);
-                      }}
-                      edge="start"
-                      size="small"
-                    >
-                      {yOption ? (
-                        <CheckBoxOutlined />
-                      ) : (
-                        <CheckBoxOutlineBlank />
-                      )}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              },
-            }}
-          ></TextField>
-        </Grid>
-        <Grid size={4}>
-          <TextField
-            fullWidth
-            value={yTotalDamping}
-            onChange={(e) => {
-              setyTotalDamping(Number(e.target.value));
-            }}
-            id="totalDampingY"
-            label="Y-Total Damping"
-            variant={VARIANT}
-            style={{ backgroundColor: !yOption ? OVERRIDESCOLOR : INPUTSCOLOR }}
-            type="number"
-            slotProps={{
-              input: {
-                readOnly: !yOption ? true : false,
-                endAdornment: <InputAdornment position="end">%</InputAdornment>,
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <IconButton
-                      aria-label={yOption ? "Default" : "Override"}
-                      onClick={() => {
-                        setYOption(!yOption);
-                      }}
-                      edge="start"
-                      size="small"
-                    >
-                      {yOption ? (
-                        <CheckBoxOutlineBlank />
-                      ) : (
-                        <CheckBoxOutlined />
-                      )}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              },
-            }}
-          ></TextField>
-        </Grid>
-
-        {/* Module Length and Width */}
-        <Grid size={4}>
-          <TextField
-            fullWidth
-            value={moduleLength}
-            onChange={(e) => {
-              setmoduleLength(Number(e.target.value));
-            }}
-            id="moduleLength"
-            label="Module Length"
-            variant={VARIANT}
-            type="number"
-            style={{ backgroundColor: INPUTSCOLOR }}
-            slotProps={{
-              input: {
-                endAdornment: (
-                  <InputAdornment position="end">{units.length}</InputAdornment>
-                ),
-              },
-            }}
-          ></TextField>
-        </Grid>
-        <Grid size={4}>
-          <TextField
-            fullWidth
-            value={moduleWidth}
-            onChange={(e) => {
-              setmoduleWidth(Number(e.target.value));
-            }}
-            id="moduleWidth"
-            label="Module Width"
-            variant={VARIANT}
-            style={{ backgroundColor: INPUTSCOLOR }}
-            type="number"
-            slotProps={{
-              input: {
-                endAdornment: (
-                  <InputAdornment position="end">{units.length}</InputAdornment>
-                ),
-              },
-            }}
-          ></TextField>
-        </Grid>
-      </Grid>
-    </Box>
-  );
-};
-
 const BuildingForm = () => {
   const units = {
     force: "kips",
@@ -396,27 +119,53 @@ const BuildingForm = () => {
     bldgProps.BY = bldgYwidth;
     bldgProps.S = systems.indexOf(bldgSystem) + 1;
 
+    if (!xPeriodChecked) bldgProps.TX = xPeriod;
+    if (!xIntrinsicDampingChecked) bldgProps.ZetaX = xIntrinsicDamping / 100;
+    if (!xModalMassChecked) bldgProps.WX = xModalMass * 1000;
+    if (!yPeriodChecked) bldgProps.TY = yPeriod;
+    if (!yIntrinsicDampingChecked) bldgProps.ZetaY = yIntrinsicDamping / 100;
+    if (!yModalMassChecked) bldgProps.WY = yModalMass * 1000;
+
     damperProps.LocX = locations.indexOf(xDamperLocation);
     damperProps.LocY = locations.indexOf(yDamperLocation);
     damperProps.ModL = moduleLength;
     damperProps.ModW = moduleWidth;
-    damperProps.AccRedX = xAccelReduction;
-    damperProps.AccRedY = yAccelReduction;
-    damperProps.ZetaTotalX = xTotalDamping;
-    damperProps.ZetaTotalY = yTotalDamping;
+    damperProps.AccRedX = xAccelReduction / 100;
+    damperProps.AccRedY = yAccelReduction / 100;
+    damperProps.ZetaTotalX = xTotalDamping / 100;
+    damperProps.ZetaTotalY = yTotalDamping / 100;
     damperProps.OptionX = xOption;
     damperProps.OptionY = yOption;
 
     console.log("BUILDING CHANGED: ", bldgProps);
     console.log("DAMPER CHANGED: ", damperProps);
+    
+    // Recalculate and update values
     const outputs = recalculate();
+
+    console.log("OUTPUTS: ", outputs);
 
     if (xPeriodChecked) setxPeriod(Math.round(outputs.TX * 1e3) / 1e3);
     if (yPeriodChecked) setyPeriod(Math.round(outputs.TY * 1e3) / 1e3);
+    // Percent values
     if (xIntrinsicDampingChecked) setxIntrinsicDamping(outputs.ZetaX * 100);
     if (yIntrinsicDampingChecked) setyIntrinsicDamping(outputs.ZetaY * 100);
+    // kips / tonnes
     if (xModalMassChecked) setxModalMass(outputs.WX / 1000);
     if (yModalMassChecked) setyModalMass(outputs.WY / 1000);
+
+    if (xOption) {
+      setxTotalDamping(outputs.ZetaTotalX * 100);
+    } else {
+      setxAccelReduction(outputs.AccRedX * 100);      
+    }
+
+    if (yOption) {
+      setyTotalDamping(outputs.ZetaTotalY * 100);
+    } else {      
+      setyAccelReduction(outputs.AccRedY * 100);
+    }
+
   }, [
     numFloors,
     bldgHeight,

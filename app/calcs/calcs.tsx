@@ -15,30 +15,26 @@ const CONSTANTS = {
   Patm: 1.013e5, // N / m**2 (1 atm)
 };
 
-const DEBUG = false;
-
-enum unit_systems {
-  US = 1, // kips, ft, s
-  SI = 2, // tonne, m, s
-}
+const DEBUG = true;
 
 export interface building_properties {
   N: number; // number of floors
   H: number; // Building Height
   BX: number; // Building X- Width
   BY: number; // Building Y - Width
-  units?: unit_systems; // Unit system (default = SI)
+  units?: number; // Unit system 1 = US, 2 = SI (default = SI)
   S?: number; // Structural System (default = 1)
-}
-
-enum damper_locations {
-  "On Roof" = 1,
-  "In Modules" = 2,
+  TX?: number,
+  TY?: number,
+  ZetaX?: number;
+  ZetaY?: number;
+  WX?: number;
+  WY?: number;
 }
 
 export interface damper_properties {
-  LocX: damper_locations;
-  LocY: damper_locations;
+  LocX: number;
+  LocY: number;
   ModL: number; // Module Length
   ModW: number; // Module width
   AccRedX: number; // acc reduction X
@@ -56,6 +52,10 @@ export interface output_properties {
   ZetaY: number;
   WX: number;
   WY: number;
+  AccRedX: number; // acc reduction X
+  AccRedY: number; // acc reduction Y
+  ZetaTotalX: number; // total damping X
+  ZetaTotalY: number; // total damping Y  
 }
 
 export const BldgDynamics = (
@@ -68,8 +68,8 @@ export const BldgDynamics = (
 
   let { BX, BY, H } = bldgProps;
   const { N, units, S } = bldgProps;
-  let { ModL, ModW, ZetaTotalX, ZetaTotalY } = damperProps;
-  const { LocX, LocY, AccRedX, AccRedY, OptionX, OptionY } = damperProps;
+  let { ModL, ModW, AccRedX, AccRedY, ZetaTotalX, ZetaTotalY } = damperProps;
+  const { LocX, LocY, OptionX, OptionY } = damperProps;
 
   if (DEBUG) console.log("Inputs: ", bldgProps, damperProps);
 
@@ -102,6 +102,13 @@ export const BldgDynamics = (
     ZetaY = 1.5 / 100;
   }
 
+  // User override?
+  TX = bldgProps.TX ? bldgProps.TX : TX;
+  TY = bldgProps.TY ? bldgProps.TY : TY;
+  ZetaX = bldgProps.ZetaX ? bldgProps.ZetaX : ZetaX;
+  ZetaY = bldgProps.ZetaY ? bldgProps.ZetaY : ZetaY;
+   
+
   // // Based on mathcad calcs
   // TX = H / (ft2m(10) * 10);
   // TY = H / (ft2m(10) * 10);
@@ -128,9 +135,9 @@ export const BldgDynamics = (
   // const Wb = CONSTANTS.RhoBuild * BX * BY * H;
   const Wb = CONSTANTS.wm * (N * BX * BY) + CONSTANTS.wf * (2 * BX + 2 * BY) * H;
 
-  // Modal Mass (tonnes / kips) (units == 1 ? kgs2lbs(1) : 1) *
-  const WX = Beta(H, BX) * Wb;
-  const WY = Beta(H, BY) * Wb;
+  // Modal Mass (tonnes / kips)
+  const WX = bldgProps.WX ? bldgProps.WX : Beta(H, BX) * Wb;
+  const WY = bldgProps.WY ? bldgProps.WY : Beta(H, BY) * Wb;
 
   if (DEBUG) console.log("Wb, WX, WY =\n", Wb, WX, WY);
 
@@ -138,30 +145,41 @@ export const BldgDynamics = (
   let ZetaAddHBY = ZetaTotalY - ZetaY;
 
   if (OptionX) {
+    // Acceleration Reduction is given, Calculate ZetaTotal
     ZetaAddHBX = ZetaX * (1 / (AccRedX - 1) ** 2 - 1);
     ZetaTotalX = ZetaX + ZetaAddHBX;
+  } else {
+    // ZetaTotal given, Calculate Acceleration Reduction
+    AccRedX = Math.sqrt(ZetaX / ZetaTotalX);
   }
 
   if (OptionY) {
+    // Acceleration Reduction is given, Calculate ZetaTotal
     ZetaAddHBY = ZetaY * (1 / (AccRedY - 1) ** 2 - 1);
     ZetaTotalY = ZetaY + ZetaAddHBY;
+  } else {
+    // ZetaTotal given, Calculate Acceleration Reduction
+    AccRedY = Math.sqrt(ZetaY / ZetaTotalY);
   }
 
   const AccRatioX = Math.sqrt(ZetaX / (ZetaX + ZetaAddHBX));
   const AccRatioY = Math.sqrt(ZetaY / (ZetaY + ZetaAddHBY));
 
   if (DEBUG) console.log(
-    "ZetaAddHBX, ZetaTotalX, AccRatioX =\n",
+    "ZetaX, ZetaAddHBX, ZetaTotalX =\n",
+    ZetaX,
     ZetaAddHBX,
-    ZetaTotalX,
-    AccRatioX
+    ZetaTotalX
   );
   if (DEBUG) console.log(
-    "ZetaAddHBY, ZetaTotalY, AccRatioY =\n",
+    "ZetaY, ZetaAddHBY, ZetaTotalY =\n",
+    ZetaY,
     ZetaAddHBY,
-    ZetaTotalY,
-    AccRatioY
+    ZetaTotalY
   );
+
+  if (DEBUG) console.log("AccRedX, AccRatioX = \n", AccRedX, AccRatioX);
+  if (DEBUG) console.log("AccRedY, AccRatioY = \n", AccRedY, AccRatioY);
 
   const temp_MuX =
     6 * ZetaAddHBX ** 2 +
@@ -446,6 +464,10 @@ export const BldgDynamics = (
     ZetaY,
     WX,
     WY,
+    AccRedX,
+    AccRedY,
+    ZetaTotalX,
+    ZetaTotalY
   };
 };
 
