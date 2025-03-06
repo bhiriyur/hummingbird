@@ -26,13 +26,12 @@ function CameraLogger() {
 }
 
 function Box(props: BuildingDimensions) {
-  const [clicked, click] = useState(false);
   const { BX, BY, BZ, N } = props;
   const BYF = BY / N;
   const OFFSET = [-10, 0, -10];
 
   // Build Box List
-  let boxList = [];
+  const boxList = [];
   for (let i = 0; i < N; i++) {
     boxList.push(
       <mesh
@@ -40,12 +39,11 @@ function Box(props: BuildingDimensions) {
         {...props}
         scale={1}
         position={[0.5 * BX, 0.5 * BY, 0.5 * BZ]}
-        onClick={() => click(!clicked)}
       >
         <boxGeometry
           args={[OFFSET[0] + BX, OFFSET[1] + i * BYF, OFFSET[2] + BZ]}
         />
-        <meshStandardMaterial color={ clicked ? "orange" : "hotpink"} opacity={1} />
+        <meshStandardMaterial color={"orange"} opacity={1} />
         <Edges scale={1} threshold={15} color="black" renderOrder={1000} />
       </mesh>
     );
@@ -55,7 +53,7 @@ function Box(props: BuildingDimensions) {
 }
 
 const BuildingThreeD = (props: BuildingDimensions) => {
-  const { BX, BY, BZ, N } = props;
+  const { BX, BY, BZ } = props;
   return (
     <div style={{ height: "100%" }}>
       {/* <Canvas orthographic camera={{ position: [4*BX, 1*BY, 8*BZ] }}> */}
