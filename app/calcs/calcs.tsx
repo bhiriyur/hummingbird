@@ -8,6 +8,7 @@ const CONSTANTS = {
   MembraneFill: 0.55, // 55%
   ExtraVolumeFactor: 1.05, // 105%
   AdditionalLongitudinalClearance: 0.1, // 10 cm
+  RoofClearance: 0, // Description TBD
   CylDiameter: 0.9, // 90 cm
   RhoWater: 998, // Density of water in kg / m**3
   HeatCapacityRatioAir: 1.4,
@@ -105,11 +106,11 @@ export const BldgDynamics = (
     ZetaY = 1.5 / 100;
   }
 
-  // Based on Shayne's mathcad calcs
-  TX = H / (ft2m(10) * 10);
-  TY = H / (ft2m(10) * 10);
-  ZetaX = 0.007;
-  ZetaY = 0.007;
+  // // Based on mathcad calcs
+  // TX = H / (ft2m(10) * 10);
+  // TY = H / (ft2m(10) * 10);
+  // ZetaX = 0.007;
+  // ZetaY = 0.007;
 
   console.log("TX, TY, ZetaX, ZetaY =\n", TX, TY, ZetaX, ZetaY);
 
@@ -128,8 +129,8 @@ export const BldgDynamics = (
   };
 
   // Building Mass
-  const Wb = CONSTANTS.RhoBuild * BX * BY * H;
-  //     CONSTANTS.wm * (N * BX * BY) + CONSTANTS.wf * (2 * BX + 2 * BY) * H;
+  // const Wb = CONSTANTS.RhoBuild * BX * BY * H;
+  const Wb = CONSTANTS.wm * (N * BX * BY) + CONSTANTS.wf * (2 * BX + 2 * BY) * H;
 
   // Modal Mass (tonnes / kips) (units == 1 ? kgs2lbs(1) : 1) *
   const WX = Beta(H, BX) * Wb;
@@ -224,31 +225,35 @@ export const BldgDynamics = (
     DispTargetHBY
   );
 
-  let MaxCycleLengthX = BX;
-  let MaxCycleLengthY = BY;
+  let MaxCylLengthX = BX;
+  let MaxCylLengthY = BY;
 
-  if (LocX === 2) MaxCycleLengthX = ModL;
-  if (LocY === 2) MaxCycleLengthY = ModL;
+  if (LocX === 2) MaxCylLengthX = ModL;
+  if (LocY === 2) MaxCylLengthY = ModL;
+
+  // Deducting Roof Clearance
+  MaxCylLengthX -= CONSTANTS.RoofClearance;
+  MaxCylLengthY -= CONSTANTS.RoofClearance;
 
   const CenterLengthX =
-    MaxCycleLengthX -
+    MaxCylLengthX -
     2 * MembrangeLengthX -
     CONSTANTS.AdditionalLongitudinalClearance;
   const CenterLengthY =
-    MaxCycleLengthY -
+    MaxCylLengthY -
     2 * MembrangeLengthY -
     CONSTANTS.AdditionalLongitudinalClearance;
 
   console.log(
-    "MembrangeLengthX, MaxCycleLengthX, CenterLengthX = \n",
+    "MembrangeLengthX, MaxCylLengthX, CenterLengthX = \n",
     MembrangeLengthX,
-    MaxCycleLengthX,
+    MaxCylLengthX,
     CenterLengthX
   );
   console.log(
-    "MembrangeLengthY, MaxCycleLengthY, CenterLengthY = \n",
+    "MembrangeLengthY, MaxCylLengthY, CenterLengthY = \n",
     MembrangeLengthY,
-    MaxCycleLengthY,
+    MaxCylLengthY,
     CenterLengthY
   );
 
@@ -260,14 +265,14 @@ export const BldgDynamics = (
 
   console.log("AreaCenter, AreaMemHor =\n", AreaCenter, AreaMemHor);
   console.log(
-    "MaxCycleLengthX, CenterLengthX, AreaMemVertX =\n",
-    MaxCycleLengthX,
+    "MaxCylLengthX, CenterLengthX, AreaMemVertX =\n",
+    MaxCylLengthX,
     CenterLengthX,
     AreaMemVertX
   );
   console.log(
-    "MaxCycleLengthY, CenterLengthY, AreaMemVertY =\n",
-    MaxCycleLengthY,
+    "MaxCylLengthY, CenterLengthY, AreaMemVertY =\n",
+    MaxCylLengthY,
     CenterLengthY,
     AreaMemVertY
   );
@@ -278,8 +283,8 @@ export const BldgDynamics = (
   const MassEndHorX = CONSTANTS.RhoWater * AreaMemHor * MembrangeLengthX;
   const MassEndHorY = CONSTANTS.RhoWater * AreaMemHor * MembrangeLengthY;
 
-  const MassEndVertX = CONSTANTS.RhoWater * AreaMemVertX * MembrangeLengthX;
-  const MassEndVertY = CONSTANTS.RhoWater * AreaMemVertY * MembrangeLengthY;
+  const MassEndVertX = CONSTANTS.RhoWater * AreaMemHor * MembrangeLengthX;
+  const MassEndVertY = CONSTANTS.RhoWater * AreaMemHor * MembrangeLengthY;
 
   const WaterMassPerCylinderX =
     CONSTANTS.RhoWater * AreaCenter * CenterLengthX +
@@ -414,8 +419,8 @@ export const BldgDynamics = (
   const TotalLengthAirCylinderX = RoundUpNumWaterCylindersX * EachAirCylLengthX;
   const TotalLengthAirCylinderY = RoundUpNumWaterCylindersY * EachAirCylLengthY;
 
-  const ExactNumAirCylindersX = TotalLengthAirCylinderX / MaxCycleLengthX;
-  const ExactNumAirCylindersY = TotalLengthAirCylinderY / MaxCycleLengthY;
+  const ExactNumAirCylindersX = TotalLengthAirCylinderX / MaxCylLengthX;
+  const ExactNumAirCylindersY = TotalLengthAirCylinderY / MaxCylLengthY;
 
   const RoundUpNumAirCylindersX = Math.ceil(ExactNumAirCylindersX);
   const RoundUpNumAirCylindersY = Math.ceil(ExactNumAirCylindersY);

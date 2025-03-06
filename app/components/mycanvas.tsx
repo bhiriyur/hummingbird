@@ -41,7 +41,7 @@ const MyCanvas = () => {
   const [value, setValue] = React.useState(0);
 
   return (
-    <Card  style={{height:'100%'}}>
+    <Card  style={{height:'100%', "backgroundColor": "#FFFFFA" }}>
       <Tabs
         value={value}
         onChange={(e, newValue: number) => {
@@ -58,10 +58,10 @@ const MyCanvas = () => {
       </Tabs>
       <TabPanel value={value} index={0}>
         <BuildingThreeD
-          height={450}
-          numFLoors={45}
-          xWidth={50}
-          yWidth={40}
+          BX={80}
+          BY={450}
+          BZ={55}
+          N={42}
         ></BuildingThreeD>
       </TabPanel>
       <TabPanel value={value} index={1}>

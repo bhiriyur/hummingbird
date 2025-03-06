@@ -1,64 +1,79 @@
 "use client";
 
-import { OrbitControls } from "@react-three/drei";
-import React, { useState } from 'react';
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { Text } from '@react-three/drei';
-
+import { Edges, OrbitControls } from "@react-three/drei";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { useState } from "react";
+import { PerspectiveCamera } from "three";
 
 interface BuildingDimensions {
-  height: number;
-  numFLoors: number;
-  xWidth: number;
-  yWidth: number;
+  BX: number;
+  BY: number;
+  BZ: number;
+  N: number;
 }
 
-function CameraPosition() {
+function CameraLogger() {
   const { camera } = useThree();
-  const [position, setPosition] = useState(camera.position.toArray());
 
   useFrame(() => {
-    setPosition(camera.position.toArray());
+    if (camera! instanceof PerspectiveCamera) {
+      const position = camera.position.clone();
+      console.log("Camera Position:", position);
+    }
   });
 
-  return (
-    <Text position={[0, 10, 20]} fontSize={20} color="red">
-      Camera Position: {position.map(coord => coord.toFixed(2)).join(', ')}
-    </Text>
-  );
+  return null;
 }
 
 function Box(props: BuildingDimensions) {
   const [clicked, click] = useState(false);
+  const { BX, BY, BZ, N } = props;
+  const BYF = BY / N;
+  const OFFSET = [-10, 0, -10];
 
-  return (
-    <mesh
-    {...props}
-    scale={clicked ? 1.5 : 1}
-    onClick={() => click(!clicked)}
-  >
-      <boxGeometry args={[props.xWidth, props.height, props.yWidth, 1, props.numFLoors, 1]} />
-      <meshStandardMaterial wireframe color={clicked ? "hotpink" : "orange"} />
-      {/* <Edges edges={new THREE.EdgesGeometry(new THREE.BoxGeometry(10, 20, 40))} color="black" /> */}
-    </mesh>    
-  );
+  // Build Box List
+  let boxList = [];
+  for (let i = 0; i < N; i++) {
+    boxList.push(
+      <mesh
+        key={"Box" + i}
+        {...props}
+        scale={1}
+        position={[0.5 * BX, 0.5 * BY, 0.5 * BZ]}
+        onClick={() => click(!clicked)}
+      >
+        <boxGeometry
+          args={[OFFSET[0] + BX, OFFSET[1] + i * BYF, OFFSET[2] + BZ]}
+        />
+        <meshStandardMaterial color={ clicked ? "orange" : "hotpink"} opacity={1} />
+        <Edges scale={1} threshold={15} color="black" renderOrder={1000} />
+      </mesh>
+    );
+  }
+
+  return <>{ boxList }</>;
 }
 
-const BuildingThreeD = ( props: BuildingDimensions ) => {
+const BuildingThreeD = (props: BuildingDimensions) => {
+  const { BX, BY, BZ, N } = props;
   return (
-    <div style={{"height": "100%"}}>
-      <Canvas  camera={{ position: [4*props.xWidth, 0.3*props.height, 8*props.yWidth] }}>
+    <div style={{ height: "100%" }}>
+      {/* <Canvas orthographic camera={{ position: [4*BX, 1*BY, 8*BZ] }}> */}
+      <Canvas
+        orthographic
+        camera={{
+          position: [4 * BX, 1 * BY, 8 * BZ],
+        }}
+        style={{
+          width: "100%",
+          height: "100%",
+          backgroundColor: "#f0f0f0",
+        }}
+      >
         <ambientLight intensity={Math.PI / 2} />
-        {/* <spotLight
-          position={[10, 10, 10]}
-          angle={0.15}
-          penumbra={1}
-          decay={0}
-          intensity={Math.PI}
-        /> */}
-        {/* <pointLight position={[-10, -10, -10]} decay={0} intensity={Math.PI} /> */}
         <Box {...props} />
-        {/* <CameraPosition /> */}
+        <axesHelper args={[5]} />
+        <CameraLogger />
         <OrbitControls />
       </Canvas>
     </div>

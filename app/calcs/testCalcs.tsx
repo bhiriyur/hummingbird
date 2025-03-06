@@ -17,7 +17,7 @@ const bldgProps: building_properties = {
 const damperProps: damper_properties = {
   LocX: 2,
   LocY: 2,
-  ModL: 40,
+  ModL: 20,
   ModW: 8,
   AccRedX: 0.4,
   AccRedY: 0.3,
