@@ -2,6 +2,7 @@
 
 import PrintIcon from "@mui/icons-material/Print";
 import ShareIcon from "@mui/icons-material/Share";
+import BalanceIcon from '@mui/icons-material/Balance';
 import { Box } from "@mui/material";
 import AppBar from "@mui/material/AppBar";
 import Container from "@mui/material/Container";
@@ -12,12 +13,18 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import Image from "next/image";
 import logo from "../../public/cropped-hummingbird_logo_blue-32x32.png";
+import { useState } from "react";
 
 function ResponsiveAppBar() {
   const actions = [
     { icon: <PrintIcon />, name: "Print" },
     { icon: <ShareIcon />, name: "Share" },
+    { icon:<BalanceIcon/>, name: "Toggle units US/SI" },
   ];
+
+  const [open, setOpen] = useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);  
 
   return (
     <AppBar 
@@ -47,17 +54,17 @@ function ResponsiveAppBar() {
             HUMMINGBIRD DESIGNER
           </Typography>
           <SpeedDial
+            FabProps={{ size: "small", style: { backgroundColor: "primary" } }}
             ariaLabel="SpeedDial"
-            sx={{ position: "absolute", right: 16 }}
-            icon={<SpeedDialIcon />}
-            direction="left"
-            
+            sx={{ position: "absolute", right: 16}}
+            icon={<SpeedDialIcon/>}
+            direction="left"         
           >
             {actions.map((action) => (
               <SpeedDialAction
                 key={action.name}
                 icon={action.icon}
-                tooltipTitle={action.name}
+                tooltipTitle={action.name}             
               />
             ))}
           </SpeedDial>

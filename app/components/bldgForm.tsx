@@ -23,9 +23,10 @@ interface UnitSytem {
   time?: string;
 }
 
-const VARIANT = "filled";
-const INPUTSCOLOR = "white";
-const OVERRIDESCOLOR = "#EEE";
+const VARIANT = "outlined";
+const INPUTSCOLOR = "#FEFEFE";
+const OVERRIDESCOLOR = "#F5F5F5";
+const BGCOLOR = "#FEFEFE";
 
 const BuildingDesign = (units: UnitSytem) => {
   const [numFloors, setNumFloors] = useState(42);
@@ -718,7 +719,7 @@ const DamperPerformance = (units: UnitSytem) => {
 const BuildingForm = () => {
   return (
     <div>
-      <Accordion defaultExpanded sx={{ backgroundColor: OVERRIDESCOLOR }}>
+      <Accordion defaultExpanded sx={{ backgroundColor: BGCOLOR }}>
         <AccordionSummary
           expandIcon={<ExpandMoreIcon />}
           aria-controls="panel1-content"
@@ -731,7 +732,7 @@ const BuildingForm = () => {
         </AccordionDetails>
       </Accordion>
 
-      <Accordion defaultExpanded sx={{ backgroundColor: OVERRIDESCOLOR }}>
+      <Accordion defaultExpanded sx={{ backgroundColor: BGCOLOR }}>
         <AccordionSummary
           expandIcon={<ExpandMoreIcon />}
           aria-controls="panel1-content"
