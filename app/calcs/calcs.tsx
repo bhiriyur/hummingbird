@@ -15,7 +15,7 @@ const CONSTANTS = {
   Patm: 1.013e5, // N / m**2 (1 atm)
 };
 
-const DEBUG = true;
+const DEBUG = false;
 
 export interface building_properties {
   N: number; // number of floors

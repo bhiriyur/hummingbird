@@ -1,36 +1,65 @@
 "use client";
 
 import { Edges, OrbitControls } from "@react-three/drei";
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { PerspectiveCamera } from "three";
+import { Canvas } from "@react-three/fiber";
+import * as THREE from "three";
 
-interface BuildingDimensions {
+export interface BuildingProps {
   BX: number;
   BY: number;
   BZ: number;
   N: number;
+  CYLDIA?: number;
+  XlOC?: string;
+  YlOC?: string;
+  NCYLX?: number;
+  NCYLY?: number;
+  LCYLX?: number;
+  LCYLY?: number;
 }
 
-function CameraLogger() {
-  const { camera } = useThree();
-
-  useFrame(() => {
-    // if (camera instanceof PerspectiveCamera) {
-      const position = camera.position.clone();
-      console.log('POS: ', camera, position)
-      // Get the current FOV
-      // const fov = camera.position.fov;
-    // console.log('Current FOV:', fov);      console.log("Camera Position:", position);
-    // }
-  });
-
-  return null;
+function XZGrid() {
+  const size = 100;
+  const divs = 10;
+  const GH = new THREE.GridHelper(size, divs);
+  return (
+    <primitive object={GH} rotation-x={Math.PI / 2} position={[50, 50, 0]} />
+  );
 }
 
-function Box(props: BuildingDimensions) {
+function RoofCylinders(props: BuildingProps) {
+  // Render Roof cylinder elements
+  const { BX, BY, BZ } = props;
+  const dia = props?.CYLDIA ? props.CYLDIA : 1.0;
+  // Center of roof top
+  const origin = [0.5 * BX, 0.5 * BY, BZ + 0.5 * dia];
+  const N = props?.NCYLX ? props.NCYLX : 0;
+  const length = props?.LCYLX ? props.LCYLX : 40;
+
+  const cyls = [];
+  for (let i = 0; i < N; i++) {
+    console.log("CYLINDER: ", i);
+    cyls.push(new THREE.Vector3(origin[0], origin[1] + i * dia, origin[2]));
+  }
+
+  console.log("CYL: ", props, N, dia, cyls);
+
+  return (
+    <>
+      {cyls.map((pos, index) => (
+        <mesh key={index} position={pos} rotation={[0, 0, Math.PI / 2]}>
+          <cylinderGeometry args={[0.5 * dia, 0.5 * dia, length, 32]} />
+          <meshStandardMaterial color={"#FA5522"} metalness={0.8} roughness={0.2}/>
+          <Edges scale={1} threshold={15} color="black" renderOrder={1000} />
+        </mesh>
+      ))}
+    </>
+  );
+}
+
+function Box(props: BuildingProps) {
   const { BX, BY, BZ, N } = props;
-  const BYF = BY / N;
-  const OFFSET = [-10, 0, -10];
+  const BZF = BZ / N;
 
   // Build Box List
   const boxList = [];
@@ -40,29 +69,30 @@ function Box(props: BuildingDimensions) {
         key={"Box" + i}
         {...props}
         scale={1}
-        position={[0.5 * BX, 0.5 * BY, 0.5 * BZ]}
+        position={[0.5 * BX, 0.5 * BY, (i + 0.5) * BZF]}
       >
-        <boxGeometry
-          args={[OFFSET[0] + BX, OFFSET[1] + i * BYF, OFFSET[2] + BZ]}
-        />
-        <meshStandardMaterial color={"orange"} opacity={1} />
+        <boxGeometry args={[BX, BY, BZF]} />
+        <meshStandardMaterial color={"orange"} />
         <Edges scale={1} threshold={15} color="black" renderOrder={1000} />
       </mesh>
     );
   }
 
-  return <>{ boxList }</>;
+  return <>{boxList}</>;
 }
 
-const BuildingThreeD = (props: BuildingDimensions) => {
+export const BuildingThreeD = (props: BuildingProps) => {
   const { BX, BY, BZ } = props;
+
   return (
     <div style={{ height: "100%" }}>
       {/* <Canvas orthographic camera={{ position: [4*BX, 1*BY, 8*BZ] }}> */}
       <Canvas
+        gl={{ preserveDrawingBuffer: true }}
         orthographic
         camera={{
-          position: [2.5 * BX, 1.1 * BY, 10 * BZ],
+          up: [0, 0, 1],
+          position: [2 * BX, 2 * BY, BZ],
         }}
         style={{
           width: "100%",
@@ -70,11 +100,17 @@ const BuildingThreeD = (props: BuildingDimensions) => {
           backgroundColor: "#f0f0f0",
         }}
       >
-        <ambientLight intensity={Math.PI / 2} />
+        <ambientLight intensity={2} />
+        <pointLight
+          color={"white"}
+          position={[props.BX, props.BY, 1.2 * props.BZ]}
+          intensity={80000}
+        />
         <Box {...props} />
+        <RoofCylinders {...props} />
         <axesHelper args={[5]} />
-        {/* <CameraLogger /> */}
         <OrbitControls />
+        <XZGrid></XZGrid>
       </Canvas>
     </div>
   );

@@ -17,12 +17,6 @@ import Typography from "@mui/material/Typography";
 import { useEffect, useState } from "react";
 import * as calcs from "../calcs/calcs";
 
-interface UnitSytem {
-  force?: string;
-  length?: string;
-  time?: string;
-}
-
 const VARIANT = "outlined";
 const INPUTSCOLOR = "#FEFEFE";
 const OVERRIDESCOLOR = "#F5F5F5";
@@ -48,12 +42,13 @@ const damperProps: calcs.damper_properties = {
   OptionY: true,
 };
 
+
 const recalculate = () => {
   console.log("Recalculating...");
   return calcs.BldgDynamics(bldgProps, damperProps);
 };
 
-const BuildingForm = () => {
+const BuildingForm = ({setBldg} : {setBldg: any}) => {
   const units = {
     force: "kips",
     length: "ft",
@@ -105,7 +100,7 @@ const BuildingForm = () => {
   const [yOption, setYOption] = useState(false);
 
   useEffect(() => {
-    console.clear();
+    // console.clear();
     console.log("UseEffect Rerender");
     const systems = [
       "Steel moment-resisting frame",
@@ -143,6 +138,17 @@ const BuildingForm = () => {
     
     // Recalculate and update values
     const outputs = recalculate();
+    
+    // Set increment count
+    setBldg({
+      N: numFloors,
+      BX: bldgXwidth,
+      BY: bldgYwidth,
+      BZ: bldgHeight,
+      CYLDIA: 5,
+      NCYLX: 3,
+      LCYLX: 40      
+    });
 
     console.log("OUTPUTS: ", outputs);
 
@@ -313,6 +319,10 @@ const BuildingForm = () => {
                   }}
                   id="bldgStructuralSystem"
                   label="Structural System"
+                  slotProps={{
+                    input: { id: "select-struc-system" },
+                    inputLabel: { htmlFor: "select-struc-system" },
+                  }}                  
                   variant={VARIANT}
                   style={{ backgroundColor: INPUTSCOLOR }}
                 >
@@ -668,6 +678,10 @@ const BuildingForm = () => {
                   label="X-Damper Location"
                   style={{ backgroundColor: INPUTSCOLOR }}
                   variant={VARIANT}
+                  slotProps={{
+                    input: { id: "select-xdamper-loc" },
+                    inputLabel: { htmlFor: "select-xdamper-loc" },
+                  }}                   
                 >
                   {locations.map((system) => (
                     <MenuItem key={system} value={system}>
@@ -774,6 +788,10 @@ const BuildingForm = () => {
                   label="Y-Damper Location"
                   style={{ backgroundColor: INPUTSCOLOR }}
                   variant={VARIANT}
+                  slotProps={{
+                    input: { id: "select-ydamper-loc" },
+                    inputLabel: { htmlFor: "select-ydamper-loc" },
+                  }}                   
                 >
                   {locations.map((system) => (
                     <MenuItem key={system} value={system}>
