@@ -16,6 +16,7 @@ export interface BuildingProps {
   NCYLY?: number;
   LCYLX?: number;
   LCYLY?: number;
+  LOGS: string;
 }
 
 function XZGrid() {
@@ -105,9 +106,9 @@ export const BuildingThreeD = (props: BuildingProps) => {
         />
         <Box {...props} />
         <RoofCylinders {...props} />
-        <axesHelper args={[5]} />
         <OrbitControls />
         <XZGrid></XZGrid>
+        <axesHelper args={[100]} />
       </Canvas>
     </div>
   );

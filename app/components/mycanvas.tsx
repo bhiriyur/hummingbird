@@ -14,6 +14,10 @@ interface TabPanelProps {
   index: number;
 }
 
+interface StringProps {
+  calclogs: string;
+}
+
 function TabPanel(props: TabPanelProps) {
   const { children, value, index, ...other } = props;
 
@@ -39,6 +43,28 @@ function a11yProps(index: number) {
   };
 }
 
+function ShowCalcLogs(props: StringProps) {
+  return (
+    <div
+      id={"calc-logs"}
+      aria-labelledby={"calc-logs"}
+      style={{
+        width: "100%",
+        height: "100%",
+        overflow: "auto",
+        whiteSpace: "pre-line",
+        backgroundColor: "black",
+        color: "white",
+        fontFamily: "monospace",
+        fontSize: "medium",
+        padding: "5px"
+      }}
+    >
+      {props.calclogs}
+    </div>
+  );
+}
+
 const MyCanvas = (props: BuildingProps) => {
   const [value, setValue] = React.useState(0);
 
@@ -57,7 +83,7 @@ const MyCanvas = (props: BuildingProps) => {
         <Tab label="Building" {...a11yProps(0)} />
         <Tab label="Damper-X" {...a11yProps(1)} />
         <Tab label="Damper-Y" {...a11yProps(1)} />
-        <Tab label="Performance" {...a11yProps(2)} />
+        <Tab label="Calc-Logs" {...a11yProps(2)} />
       </Tabs>
       <TabPanel value={value} index={0}>
         <BuildingThreeD {...props}></BuildingThreeD>
@@ -76,7 +102,7 @@ const MyCanvas = (props: BuildingProps) => {
         ></Dampers>
       </TabPanel>
       <TabPanel value={value} index={3}>
-        Damper Performance
+        <ShowCalcLogs calclogs={props.LOGS} />
       </TabPanel>
     </Card>
   );

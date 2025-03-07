@@ -154,6 +154,7 @@ const BuildingForm = ({setBldg} : {setBldg: any}) => {
       YLOC: yDamperLocation,
       NCYLY: outputs.NCYLY,
       LCYLY: outputs.LCYLY,
+      LOGS: outputs.CalcLogs
     });
 
     console.log("OUTPUTS: ", outputs);

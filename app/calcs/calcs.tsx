@@ -15,8 +15,6 @@ export const CONSTANTS = {
   Patm: 1.013e5, // N / m**2 (1 atm)
 };
 
-const DEBUG = true;
-
 export interface building_properties {
   N: number; // number of floors
   H: number; // Building Height
@@ -24,8 +22,8 @@ export interface building_properties {
   BY: number; // Building Y - Width
   units?: number; // Unit system 1 = US, 2 = SI (default = SI)
   S?: number; // Structural System (default = 1)
-  TX?: number,
-  TY?: number,
+  TX?: number;
+  TY?: number;
   ZetaX?: number;
   ZetaY?: number;
   WX?: number;
@@ -55,12 +53,26 @@ export interface output_properties {
   AccRedX: number; // acc reduction X
   AccRedY: number; // acc reduction Y
   ZetaTotalX: number; // total damping X
-  ZetaTotalY: number; // total damping Y  
+  ZetaTotalY: number; // total damping Y
   NCYLX: number; // Number of Cylinders X
   LCYLX: number; // Length of Cylinders X
   NCYLY: number; // Number of Cylinders Y
   LCYLY: number; // Length of Cylinders Y
+  CalcLogs: string;
 }
+
+const writeLog = (...args: any[]) => {
+  let output = "";
+  
+  output += args[0];
+  for (let i = 1; i < args.length; i++) {
+    output += String(args[i]) + (i < args.length - 1 ? ", " : "");
+  }
+
+  output += "\n\n";
+
+  return output;
+};
 
 export const BldgDynamics = (
   bldgProps: building_properties,
@@ -75,7 +87,7 @@ export const BldgDynamics = (
   let { ModL, ModW, AccRedX, AccRedY, ZetaTotalX, ZetaTotalY } = damperProps;
   const { LocX, LocY, OptionX, OptionY } = damperProps;
 
-  if (DEBUG) console.log("Inputs: ", bldgProps, damperProps);
+  let FullLog = "NOTE: INPUTS PROVIDED IN US UNITS.\nALL CALCULATIONS ARE PERFORMED IN SI UNITS.\n\n";
 
   if (units === 1) {
     BX = ft2m(BX);
@@ -85,7 +97,7 @@ export const BldgDynamics = (
     ModW = ft2m(ModW);
   }
 
-  if (DEBUG) console.log("BX, BY, ModL, ModW =\n", BX, BY, ModL, ModW);
+  FullLog += writeLog("BX, BY, ModL, ModW =\n", BX, BY, ModL, ModW);
 
   // Period and Intrinsic Damping
   let TX, TY, ZetaX, ZetaY;
@@ -111,7 +123,6 @@ export const BldgDynamics = (
   TY = bldgProps.TY ? bldgProps.TY : TY;
   ZetaX = bldgProps.ZetaX ? bldgProps.ZetaX : ZetaX;
   ZetaY = bldgProps.ZetaY ? bldgProps.ZetaY : ZetaY;
-   
 
   // // Based on mathcad calcs
   // TX = H / (ft2m(10) * 10);
@@ -119,7 +130,7 @@ export const BldgDynamics = (
   // ZetaX = 0.007;
   // ZetaY = 0.007;
 
-  if (DEBUG) console.log("TX, TY, ZetaX, ZetaY =\n", TX, TY, ZetaX, ZetaY);
+  FullLog += writeLog("TX, TY, ZetaX, ZetaY =\n", TX, TY, ZetaX, ZetaY);
 
   const Beta = (H: number, B: number) => {
     // Beta coefficient for Modal mass calcs
@@ -137,32 +148,31 @@ export const BldgDynamics = (
 
   // Building Mass
   // const Wb = CONSTANTS.RhoBuild * BX * BY * H;
-  const Wb = CONSTANTS.wm * (N * BX * BY) + CONSTANTS.wf * (2 * BX + 2 * BY) * H;
+  const Wb =
+    CONSTANTS.wm * (N * BX * BY) + CONSTANTS.wf * (2 * BX + 2 * BY) * H;
 
   // Modal Mass (tonnes / kips)
   const WX = bldgProps.WX ? bldgProps.WX : Beta(H, BX) * Wb;
   const WY = bldgProps.WY ? bldgProps.WY : Beta(H, BY) * Wb;
 
-  if (DEBUG) console.log("Wb, WX, WY =\n", Wb, WX, WY);
+  FullLog += writeLog("Wb, WX, WY =\n", Wb, WX, WY);
 
   let ZetaAddHBX;
   let ZetaAddHBY;
 
   if (!OptionX) {
     // Acceleration Reduction is given, Calculate ZetaTotal
-    console.log("Not OptionX");
-    ZetaAddHBX = ZetaX * ((1 / (AccRedX - 1) ** 2) - 1);
+    ZetaAddHBX = ZetaX * (1 / (AccRedX - 1) ** 2 - 1);
     ZetaTotalX = ZetaX + ZetaAddHBX;
   } else {
     // ZetaTotal given, Calculate Acceleration Reduction
-    console.log("OptionX");
     ZetaAddHBX = ZetaTotalX - ZetaX;
     AccRedX = 1 + Math.sqrt(ZetaX / ZetaTotalX);
   }
 
   if (!OptionY) {
     // Acceleration Reduction is given, Calculate ZetaTotal
-    ZetaAddHBY = ZetaY * ((1 / (AccRedY - 1) ** 2) - 1);
+    ZetaAddHBY = ZetaY * (1 / (AccRedY - 1) ** 2 - 1);
     ZetaTotalY = ZetaY + ZetaAddHBY;
   } else {
     // ZetaTotal given, Calculate Acceleration Reduction
@@ -173,21 +183,21 @@ export const BldgDynamics = (
   const AccRatioX = Math.sqrt(ZetaX / ZetaTotalX);
   const AccRatioY = Math.sqrt(ZetaY / ZetaTotalY);
 
-  if (DEBUG) console.log(
-    "ZetaX, ZetaAddHBX, ZetaTotalX =\n",
-    ZetaX,
-    ZetaAddHBX,
-    ZetaTotalX
-  );
-  if (DEBUG) console.log(
-    "ZetaY, ZetaAddHBY, ZetaTotalY =\n",
-    ZetaY,
-    ZetaAddHBY,
-    ZetaTotalY
-  );
+  FullLog += writeLog(
+      "ZetaX, ZetaAddHBX, ZetaTotalX =\n",
+      ZetaX,
+      ZetaAddHBX,
+      ZetaTotalX
+    );
+    FullLog += writeLog(
+      "ZetaY, ZetaAddHBY, ZetaTotalY =\n",
+      ZetaY,
+      ZetaAddHBY,
+      ZetaTotalY
+    );
 
-  if (DEBUG) console.log("AccRedX, AccRatioX = \n", AccRedX, AccRatioX);
-  if (DEBUG) console.log("AccRedY, AccRatioY = \n", AccRedY, AccRatioY);
+  FullLog += writeLog("AccRedX, AccRatioX = \n", AccRedX, AccRatioX);
+  FullLog += writeLog("AccRedY, AccRatioY = \n", AccRedY, AccRatioY);
 
   const temp_MuX =
     6 * ZetaAddHBX ** 2 +
@@ -201,8 +211,8 @@ export const BldgDynamics = (
   const MuX = Math.max(0.005, temp_MuX);
   const MuY = Math.max(0.005, temp_MuY);
 
-  if (DEBUG) console.log("temp_MuX, mu_X =\n", temp_MuX, MuX);
-  if (DEBUG) console.log("temp_MuY, mu_Y =\n", temp_MuY, MuY);
+  FullLog += writeLog("temp_MuX, mu_X =\n", temp_MuX, MuX);
+  FullLog += writeLog("temp_MuY, mu_Y =\n", temp_MuY, MuY);
 
   const totalUsefulWaterMassX = WX * MuX;
   const totalUsefulWaterMassY = WY * MuY;
@@ -230,22 +240,22 @@ export const BldgDynamics = (
     (DispTargetHBY / (1 - CONSTANTS.MembraneFill)) *
     CONSTANTS.ExtraVolumeFactor;
 
-  if (DEBUG) console.log(
-    "totalUsefulWaterMassX, AccUndampedX, freqHBX, DispTargetBuildX, DispTargetHBX =\n",
-    totalUsefulWaterMassX,
-    AccUndampedX,
-    freqHBX,
-    DispTargetBuildX,
-    DispTargetHBX
-  );
-  if (DEBUG) console.log(
-    "totalUsefulWaterMassY, AccUndampedY, freqHBY, DispTargetBuildY, DispTargetHBY =\n",
-    totalUsefulWaterMassY,
-    AccUndampedY,
-    freqHBY,
-    DispTargetBuildY,
-    DispTargetHBY
-  );
+    FullLog += writeLog(
+      "totalUsefulWaterMassX, AccUndampedX, freqHBX, DispTargetBuildX, DispTargetHBX =\n",
+      totalUsefulWaterMassX,
+      AccUndampedX,
+      freqHBX,
+      DispTargetBuildX,
+      DispTargetHBX
+    );
+    FullLog += writeLog(
+      "totalUsefulWaterMassY, AccUndampedY, freqHBY, DispTargetBuildY, DispTargetHBY =\n",
+      totalUsefulWaterMassY,
+      AccUndampedY,
+      freqHBY,
+      DispTargetBuildY,
+      DispTargetHBY
+    );
 
   let MaxCylLengthX = BX;
   let MaxCylLengthY = BY;
@@ -266,18 +276,18 @@ export const BldgDynamics = (
     2 * MembrangeLengthY -
     CONSTANTS.AdditionalLongitudinalClearance;
 
-  if (DEBUG) console.log(
-    "MembrangeLengthX, MaxCylLengthX, CenterLengthX = \n",
-    MembrangeLengthX,
-    MaxCylLengthX,
-    CenterLengthX
-  );
-  if (DEBUG) console.log(
-    "MembrangeLengthY, MaxCylLengthY, CenterLengthY = \n",
-    MembrangeLengthY,
-    MaxCylLengthY,
-    CenterLengthY
-  );
+    FullLog += writeLog(
+      "MembrangeLengthX, MaxCylLengthX, CenterLengthX = \n",
+      MembrangeLengthX,
+      MaxCylLengthX,
+      CenterLengthX
+    );
+    FullLog += writeLog(
+      "MembrangeLengthY, MaxCylLengthY, CenterLengthY = \n",
+      MembrangeLengthY,
+      MaxCylLengthY,
+      CenterLengthY
+    );
 
   const AreaCenter = (Math.PI * CONSTANTS.CylDiameter ** 2) / 4.0;
   const AreaMemHor = CONSTANTS.MembraneFill * AreaCenter;
@@ -285,19 +295,19 @@ export const BldgDynamics = (
   const AreaMemVertX = CONSTANTS.CylDiameter * MembrangeLengthX;
   const AreaMemVertY = CONSTANTS.CylDiameter * MembrangeLengthY;
 
-  if (DEBUG) console.log("AreaCenter, AreaMemHor =\n", AreaCenter, AreaMemHor);
-  if (DEBUG) console.log(
-    "MaxCylLengthX, CenterLengthX, AreaMemVertX =\n",
-    MaxCylLengthX,
-    CenterLengthX,
-    AreaMemVertX
-  );
-  if (DEBUG) console.log(
-    "MaxCylLengthY, CenterLengthY, AreaMemVertY =\n",
-    MaxCylLengthY,
-    CenterLengthY,
-    AreaMemVertY
-  );
+  FullLog += writeLog("AreaCenter, AreaMemHor =\n", AreaCenter, AreaMemHor);
+  FullLog += writeLog(
+      "MaxCylLengthX, CenterLengthX, AreaMemVertX =\n",
+      MaxCylLengthX,
+      CenterLengthX,
+      AreaMemVertX
+    );
+    FullLog += writeLog(
+      "MaxCylLengthY, CenterLengthY, AreaMemVertY =\n",
+      MaxCylLengthY,
+      CenterLengthY,
+      AreaMemVertY
+    );
 
   const MassCenterX = CONSTANTS.RhoWater * AreaCenter * CenterLengthX;
   const MassCenterY = CONSTANTS.RhoWater * AreaCenter * CenterLengthY;
@@ -315,20 +325,20 @@ export const BldgDynamics = (
     CONSTANTS.RhoWater * AreaCenter * CenterLengthY +
     2 * CONSTANTS.RhoWater * AreaMemHor * MembrangeLengthY;
 
-  if (DEBUG) console.log(
-    "MassCenterX, MassEndHorX, MassEndVertX, WaterMassPerCylinderX =\n",
-    MassCenterX,
-    MassEndHorX,
-    MassEndVertX,
-    WaterMassPerCylinderX
-  );
-  if (DEBUG) console.log(
-    "MassCenterY, MassEndHorY, MassEndVertY, WaterMassPerCylinderY =\n",
-    MassCenterY,
-    MassEndHorY,
-    MassEndVertY,
-    WaterMassPerCylinderY
-  );
+    FullLog += writeLog(
+      "MassCenterX, MassEndHorX, MassEndVertX, WaterMassPerCylinderX =\n",
+      MassCenterX,
+      MassEndHorX,
+      MassEndVertX,
+      WaterMassPerCylinderX
+    );
+    FullLog += writeLog(
+      "MassCenterY, MassEndHorY, MassEndVertY, WaterMassPerCylinderY =\n",
+      MassCenterY,
+      MassEndHorY,
+      MassEndVertY,
+      WaterMassPerCylinderY
+    );
 
   const r1X = AreaMemVertX / AreaCenter;
   const r1Y = AreaMemVertY / AreaCenter;
@@ -348,24 +358,24 @@ export const BldgDynamics = (
   const freqStarX = (1 / (2 * Math.PI)) * Math.sqrt(kStarX / mStarX);
   const freqStarY = (1 / (2 * Math.PI)) * Math.sqrt(kStarY / mStarY);
 
-  if (DEBUG) console.log(
-    "r1X, r2X, kStarX, mStarX, gammaStarX, freqStarX =\n",
-    r1X,
-    r2X,
-    kStarX,
-    mStarX,
-    gammaStarX,
-    freqStarX
-  );
-  if (DEBUG) console.log(
-    "r1Y, r2Y, kStarY, mStarY, gammaStarY, freqStarY =\n",
-    r1Y,
-    r2Y,
-    kStarY,
-    mStarY,
-    gammaStarY,
-    freqStarY
-  );
+  FullLog += writeLog(
+      "r1X, r2X, kStarX, mStarX, gammaStarX, freqStarX =\n",
+      r1X,
+      r2X,
+      kStarX,
+      mStarX,
+      gammaStarX,
+      freqStarX
+    );
+    FullLog += writeLog(
+      "r1Y, r2Y, kStarY, mStarY, gammaStarY, freqStarY =\n",
+      r1Y,
+      r2Y,
+      kStarY,
+      mStarY,
+      gammaStarY,
+      freqStarY
+    );
 
   const massUsefulX = gammaStarX ** 2 / mStarX;
   const massUsefulY = gammaStarY ** 2 / mStarY;
@@ -379,20 +389,20 @@ export const BldgDynamics = (
   const kTotalX = kGravityX + kAirSpringX;
   const kTotalY = kGravityY + kAirSpringY;
 
-  if (DEBUG) console.log(
-    "massUsefulX, kGravityX, kAirSpringX, kTotalX =\n",
-    massUsefulX,
-    kGravityX,
-    kAirSpringX,
-    kTotalX
-  );
-  if (DEBUG) console.log(
-    "massUsefulY, kGravityY, kAirSpringY, kTotalY =\n",
-    massUsefulY,
-    kGravityY,
-    kAirSpringY,
-    kTotalY
-  );
+  FullLog += writeLog(
+      "massUsefulX, kGravityX, kAirSpringX, kTotalX =\n",
+      massUsefulX,
+      kGravityX,
+      kAirSpringX,
+      kTotalX
+    );
+    FullLog += writeLog(
+      "massUsefulY, kGravityY, kAirSpringY, kTotalY =\n",
+      massUsefulY,
+      kGravityY,
+      kAirSpringY,
+      kTotalY
+    );
 
   const AreaAir = (Math.PI * CONSTANTS.CylDiameter ** 2) / 4;
   const VolAirTotalX =
@@ -415,22 +425,22 @@ export const BldgDynamics = (
   const EachAirCylLengthX = VolAirCylX / AreaAir;
   const EachAirCylLengthY = VolAirCylY / AreaAir;
 
-  if (DEBUG) console.log(
-    "AreaAir, VolAirTotalX, VolAirInsideWaterCylX, VolAirCylX, EachAirCylLengthX =\n",
-    AreaAir,
-    VolAirTotalX,
-    VolAirInsideWaterCylX,
-    VolAirCylX,
-    EachAirCylLengthX
-  );
-  if (DEBUG) console.log(
-    "AreaAir, VolAirTotalY, VolAirInsideWaterCylY, VolAirCylY, EachAirCylLengthY =\n",
-    AreaAir,
-    VolAirTotalY,
-    VolAirInsideWaterCylY,
-    VolAirCylY,
-    EachAirCylLengthY
-  );
+  FullLog += writeLog(
+      "AreaAir, VolAirTotalX, VolAirInsideWaterCylX, VolAirCylX, EachAirCylLengthX =\n",
+      AreaAir,
+      VolAirTotalX,
+      VolAirInsideWaterCylX,
+      VolAirCylX,
+      EachAirCylLengthX
+    );
+    FullLog += writeLog(
+      "AreaAir, VolAirTotalY, VolAirInsideWaterCylY, VolAirCylY, EachAirCylLengthY =\n",
+      AreaAir,
+      VolAirTotalY,
+      VolAirInsideWaterCylY,
+      VolAirCylY,
+      EachAirCylLengthY
+    );
 
   const ExactNumWaterCylindersX = totalUsefulWaterMassX / massUsefulX;
   const ExactNumWaterCylindersY = totalUsefulWaterMassY / massUsefulY;
@@ -447,28 +457,30 @@ export const BldgDynamics = (
   const RoundUpNumAirCylindersX = Math.ceil(ExactNumAirCylindersX);
   const RoundUpNumAirCylindersY = Math.ceil(ExactNumAirCylindersY);
 
-  if (DEBUG) console.log(
-    "ExactNumWaterCylindersX, RoundUpNumWaterCylindersX, TotalLengthAirCylinderX, ExactNumAirCylindersX, RoundUpNumAirCylindersX =\n",
-    ExactNumWaterCylindersX,
-    RoundUpNumWaterCylindersX,
-    TotalLengthAirCylinderX,
-    ExactNumAirCylindersX,
-    RoundUpNumAirCylindersX
-  );
-  if (DEBUG) console.log(
-    "ExactNumWaterCylindersY, RoundUpNumWaterCylindersY, TotalLengthAirCylinderY, ExactNumAirCylindersY, RoundUpNumAirCylindersY =\n",
-    ExactNumWaterCylindersY,
-    RoundUpNumWaterCylindersY,
-    TotalLengthAirCylinderY,
-    ExactNumAirCylindersY,
-    RoundUpNumAirCylindersY
-  );
+  FullLog += writeLog(
+      "ExactNumWaterCylindersX, RoundUpNumWaterCylindersX, TotalLengthAirCylinderX, ExactNumAirCylindersX, RoundUpNumAirCylindersX =\n",
+      ExactNumWaterCylindersX,
+      RoundUpNumWaterCylindersX,
+      TotalLengthAirCylinderX,
+      ExactNumAirCylindersX,
+      RoundUpNumAirCylindersX
+    );
+    FullLog += writeLog(
+      "ExactNumWaterCylindersY, RoundUpNumWaterCylindersY, TotalLengthAirCylinderY, ExactNumAirCylindersY, RoundUpNumAirCylindersY =\n",
+      ExactNumWaterCylindersY,
+      RoundUpNumWaterCylindersY,
+      TotalLengthAirCylinderY,
+      ExactNumAirCylindersY,
+      RoundUpNumAirCylindersY
+    );
 
   // Calculate final output numbers
   const NCYLX = RoundUpNumAirCylindersX + RoundUpNumWaterCylindersX;
   const LCYLX = MaxCylLengthX;
   const NCYLY = RoundUpNumAirCylindersY + RoundUpNumWaterCylindersY;
   const LCYLY = MaxCylLengthY;
+
+  const CalcLogs = FullLog;
 
   // Return
   return {
@@ -485,7 +497,8 @@ export const BldgDynamics = (
     NCYLX,
     LCYLX,
     NCYLY,
-    LCYLY
+    LCYLY,
+    CalcLogs,
   };
 };
 
