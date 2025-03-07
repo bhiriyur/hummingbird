@@ -10,8 +10,8 @@ export interface BuildingProps {
   BZ: number;
   N: number;
   CYLDIA?: number;
-  XlOC?: string;
-  YlOC?: string;
+  XLOC?: string;
+  YLOC?: string;
   NCYLX?: number;
   NCYLY?: number;
   LCYLX?: number;
@@ -34,23 +34,43 @@ function RoofCylinders(props: BuildingProps) {
   const dia = props?.CYLDIA ? props.CYLDIA : 1.0;
   // Center of roof top
   const origin = [0.5 * BX, 0.5 * BY, BZ + 0.5 * dia];
-  const N = props?.NCYLX ? props.NCYLX : 0;
-  const length = props?.LCYLX ? props.LCYLX : 40;
 
-  const cyls = [];
-  for (let i = 0; i < N; i++) {
-    cyls.push(new THREE.Vector3(origin[0], origin[1] + i * dia, origin[2]));
+  const NX = props?.XLOC == "On Roof" ? props.NCYLX : 0;
+  const LX = props?.LCYLX ? props.LCYLX : 40;
+
+  const cylsX = [];
+  for (let i = 0; i < (NX || 0) ; i++) {
+    cylsX.push(new THREE.Vector3(origin[0], origin[1] + i * dia, origin[2]));
   }
+
+  const NY = props?.YLOC == "On Roof" ? props.NCYLY : 0;
+  const LY = props?.LCYLY ? props.LCYLY : 40;
+
+  const cylsY = [];
+  for (let i = 0; i < (NY || 0); i++) {
+    cylsY.push(new THREE.Vector3(origin[0] + i * dia, origin[1], origin[2]));
+  }
+
+    
 
   return (
     <>
-      {cyls.map((pos, index) => (
+      {cylsX.map((pos, index) => (
         <mesh key={index} position={pos} rotation={[0, 0, Math.PI / 2]}>
-          <cylinderGeometry args={[0.5 * dia, 0.5 * dia, length, 32]} />
+          <cylinderGeometry args={[0.5 * dia, 0.5 * dia, LX, 32]} />
           <meshStandardMaterial color={"#FA5522"} metalness={0.8} roughness={0.2}/>
           <Edges scale={1} threshold={15} color="black" renderOrder={1000} />
         </mesh>
       ))}
+
+    {cylsY.map((pos, index) => (
+        <mesh key={index} position={pos} rotation={[0, 0, 0]}>
+          <cylinderGeometry args={[0.5 * dia, 0.5 * dia, LY, 32]} />
+          <meshStandardMaterial color={"#55FA22"} metalness={0.8} roughness={0.2}/>
+          <Edges scale={1} threshold={15} color="black" renderOrder={1000} />
+        </mesh>
+      ))}
+
     </>
   );
 }
