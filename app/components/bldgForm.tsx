@@ -22,6 +22,8 @@ const INPUTSCOLOR = "#FEFEFE";
 const OVERRIDESCOLOR = "#F5F5F5";
 const BGCOLOR = "#FEFEFE";
 
+const fix3 = (val: number) => Math.round(val * 1e3) / 1e3;
+
 const bldgProps: calcs.building_properties = {
   N: 42,
   BX: 40,
@@ -145,36 +147,40 @@ const BuildingForm = ({setBldg} : {setBldg: any}) => {
       BX: bldgXwidth,
       BY: bldgYwidth,
       BZ: bldgHeight,
-      CYLDIA: 5,
-      NCYLX: 3,
-      LCYLX: 40      
+      CYLDIA: calcs.CONSTANTS.CylDiameter * 3.28084,
+      XLOC: xDamperLocation,
+      NCYLX: outputs.NCYLX,
+      LCYLX: outputs.LCYLX,
+      YLOC: yDamperLocation,
+      NCYLY: outputs.NCYLY,
+      LCYLY: outputs.LCYLY,
     });
 
     console.log("OUTPUTS: ", outputs);
 
-    if (xPeriodChecked) setxPeriod(Math.round(outputs.TX * 1e3) / 1e3);
-    if (yPeriodChecked) setyPeriod(Math.round(outputs.TY * 1e3) / 1e3);
+    if (xPeriodChecked) setxPeriod(fix3(outputs.TX));
+    if (yPeriodChecked) setyPeriod(fix3(outputs.TY));
     // Percent values
-    if (xIntrinsicDampingChecked) setxIntrinsicDamping(outputs.ZetaX * 100);
-    if (yIntrinsicDampingChecked) setyIntrinsicDamping(outputs.ZetaY * 100);
+    if (xIntrinsicDampingChecked) setxIntrinsicDamping(fix3(outputs.ZetaX * 100));
+    if (yIntrinsicDampingChecked) setyIntrinsicDamping(fix3(outputs.ZetaY * 100));
     // kips / tonnes
-    if (xModalMassChecked) setxModalMass(outputs.WX / 1000);
-    if (yModalMassChecked) setyModalMass(outputs.WY / 1000);
+    if (xModalMassChecked) setxModalMass(fix3(outputs.WX / 1000));
+    if (yModalMassChecked) setyModalMass(fix3(outputs.WY / 1000));
 
     if (!xOption) {
       // Acceleration Reduction is given, Calculate ZetaTotal
-      setxTotalDamping(outputs.ZetaTotalX * 100);
+      setxTotalDamping(fix3(outputs.ZetaTotalX * 100));
     } else {
       // ZetaTotal given, Calculate Acceleration Reduction
-      setxAccelReduction(outputs.AccRedX * 100);      
+      setxAccelReduction(fix3(outputs.AccRedX * 100));      
     }
 
     if (!yOption) {
       // Acceleration Reduction is given, Calculate ZetaTotal
-      setyTotalDamping(outputs.ZetaTotalY * 100);
+      setyTotalDamping(fix3(outputs.ZetaTotalY * 100));
     } else {
       // ZetaTotal given, Calculate Acceleration Reduction
-      setyAccelReduction(outputs.AccRedY * 100);
+      setyAccelReduction(fix3(outputs.AccRedY * 100));
     }
 
   }, [

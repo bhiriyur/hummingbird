@@ -32,8 +32,6 @@ const Cylinders = (config: DamperSettings) => {
     }
   }
 
-  console.log("CYLINDERS: ", cyls);
-
   return (
     <>
       {cyls.map((pos, index) => (

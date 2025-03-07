@@ -38,11 +38,8 @@ function RoofCylinders(props: BuildingProps) {
 
   const cyls = [];
   for (let i = 0; i < N; i++) {
-    console.log("CYLINDER: ", i);
     cyls.push(new THREE.Vector3(origin[0], origin[1] + i * dia, origin[2]));
   }
-
-  console.log("CYL: ", props, N, dia, cyls);
 
   return (
     <>

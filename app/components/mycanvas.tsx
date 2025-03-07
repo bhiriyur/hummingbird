@@ -42,8 +42,6 @@ function a11yProps(index: number) {
 const MyCanvas = (props: BuildingProps) => {
   const [value, setValue] = React.useState(0);
 
-  console.log("CANVAS PROPS: ", props);
-
   return (
     <Card style={{ height: "100%", backgroundColor: "#FFFFFA" }}>
       <Tabs

@@ -1,4 +1,4 @@
-const CONSTANTS = {
+export const CONSTANTS = {
   RhoBuild: 192.22156048751998, // kg/m^3 Nominal density of bulding 12 lb/ft**3
   wm: 250, // Module area mass (kg / m^2)
   wf: 75, // Facade area mass (kg / m ^2)
@@ -15,7 +15,7 @@ const CONSTANTS = {
   Patm: 1.013e5, // N / m**2 (1 atm)
 };
 
-const DEBUG = false;
+const DEBUG = true;
 
 export interface building_properties {
   N: number; // number of floors
@@ -56,6 +56,10 @@ export interface output_properties {
   AccRedY: number; // acc reduction Y
   ZetaTotalX: number; // total damping X
   ZetaTotalY: number; // total damping Y  
+  NCYLX: number; // Number of Cylinders X
+  LCYLX: number; // Length of Cylinders X
+  NCYLY: number; // Number of Cylinders Y
+  LCYLY: number; // Length of Cylinders Y
 }
 
 export const BldgDynamics = (
@@ -460,6 +464,12 @@ export const BldgDynamics = (
     RoundUpNumAirCylindersY
   );
 
+  // Calculate final output numbers
+  const NCYLX = RoundUpNumAirCylindersX + RoundUpNumWaterCylindersX;
+  const LCYLX = MaxCylLengthX;
+  const NCYLY = RoundUpNumAirCylindersY + RoundUpNumWaterCylindersY;
+  const LCYLY = MaxCylLengthY;
+
   // Return
   return {
     TX,
@@ -471,7 +481,11 @@ export const BldgDynamics = (
     AccRedX,
     AccRedY,
     ZetaTotalX,
-    ZetaTotalY
+    ZetaTotalY,
+    NCYLX,
+    LCYLX,
+    NCYLY,
+    LCYLY
   };
 };
 
