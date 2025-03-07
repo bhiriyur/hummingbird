@@ -141,29 +141,33 @@ export const BldgDynamics = (
 
   if (DEBUG) console.log("Wb, WX, WY =\n", Wb, WX, WY);
 
-  let ZetaAddHBX = ZetaTotalX - ZetaX;
-  let ZetaAddHBY = ZetaTotalY - ZetaY;
+  let ZetaAddHBX;
+  let ZetaAddHBY;
 
-  if (OptionX) {
+  if (!OptionX) {
     // Acceleration Reduction is given, Calculate ZetaTotal
-    ZetaAddHBX = ZetaX * (1 / (AccRedX - 1) ** 2 - 1);
+    console.log("Not OptionX");
+    ZetaAddHBX = ZetaX * ((1 / (AccRedX - 1) ** 2) - 1);
     ZetaTotalX = ZetaX + ZetaAddHBX;
   } else {
     // ZetaTotal given, Calculate Acceleration Reduction
-    AccRedX = Math.sqrt(ZetaX / ZetaTotalX);
+    console.log("OptionX");
+    ZetaAddHBX = ZetaTotalX - ZetaX;
+    AccRedX = 1 + Math.sqrt(ZetaX / ZetaTotalX);
   }
 
-  if (OptionY) {
+  if (!OptionY) {
     // Acceleration Reduction is given, Calculate ZetaTotal
-    ZetaAddHBY = ZetaY * (1 / (AccRedY - 1) ** 2 - 1);
+    ZetaAddHBY = ZetaY * ((1 / (AccRedY - 1) ** 2) - 1);
     ZetaTotalY = ZetaY + ZetaAddHBY;
   } else {
     // ZetaTotal given, Calculate Acceleration Reduction
-    AccRedY = Math.sqrt(ZetaY / ZetaTotalY);
+    ZetaAddHBY = ZetaTotalY - ZetaY;
+    AccRedY = 1 + Math.sqrt(ZetaY / ZetaTotalY);
   }
 
-  const AccRatioX = Math.sqrt(ZetaX / (ZetaX + ZetaAddHBX));
-  const AccRatioY = Math.sqrt(ZetaY / (ZetaY + ZetaAddHBY));
+  const AccRatioX = Math.sqrt(ZetaX / ZetaTotalX);
+  const AccRatioY = Math.sqrt(ZetaY / ZetaTotalY);
 
   if (DEBUG) console.log(
     "ZetaX, ZetaAddHBX, ZetaTotalX =\n",

@@ -105,6 +105,7 @@ const BuildingForm = () => {
   const [yOption, setYOption] = useState(false);
 
   useEffect(() => {
+    console.clear();
     console.log("UseEffect Rerender");
     const systems = [
       "Steel moment-resisting frame",
@@ -154,15 +155,19 @@ const BuildingForm = () => {
     if (xModalMassChecked) setxModalMass(outputs.WX / 1000);
     if (yModalMassChecked) setyModalMass(outputs.WY / 1000);
 
-    if (xOption) {
+    if (!xOption) {
+      // Acceleration Reduction is given, Calculate ZetaTotal
       setxTotalDamping(outputs.ZetaTotalX * 100);
     } else {
+      // ZetaTotal given, Calculate Acceleration Reduction
       setxAccelReduction(outputs.AccRedX * 100);      
     }
 
-    if (yOption) {
+    if (!yOption) {
+      // Acceleration Reduction is given, Calculate ZetaTotal
       setyTotalDamping(outputs.ZetaTotalY * 100);
-    } else {      
+    } else {
+      // ZetaTotal given, Calculate Acceleration Reduction
       setyAccelReduction(outputs.AccRedY * 100);
     }
 
