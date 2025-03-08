@@ -1,6 +1,5 @@
+import { BldgDynamics } from "../common/calcs";
 import { buildingProps, damperProps, outputProps } from "../common/types";
-
-import { BldgDynamics } from "./calcs";
 
 const building: buildingProps = {
   N: 42,

@@ -15,7 +15,7 @@ import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 
 import { useEffect, useState } from "react";
-import * as calcs from "../_calcs/calcs";
+import * as calcs from "../common/calcs";
 import { buildingProps, damperProps } from "../common/types";
 
 const VARIANT = "outlined";
@@ -151,13 +151,13 @@ const BuildingForm = ({ setBldg }: { setBldg: any }) => {
       BX: bldgXwidth,
       BY: bldgYwidth,
       BZ: bldgHeight,
-      CYLDIA: calcs.CONSTANTS.CylDiameter * 3.28084,
+      CYLDIA: calcs.CONSTANTS.CylDiameter * 3.28084, // TODO: Units checl
       XLOC: xDamperLocation,
       NCYLX: outputs.NCYLX,
-      LCYLX: outputs.LCYLX,
+      LCYLX: outputs.LCYLX, // TODO: Units check
       YLOC: yDamperLocation,
       NCYLY: outputs.NCYLY,
-      LCYLY: outputs.LCYLY,
+      LCYLY: outputs.LCYLY, // TODO: Units check
       MODL: moduleLength,
       MODW: moduleWidth,
       LOGS: outputs.CalcLogs,
@@ -173,8 +173,8 @@ const BuildingForm = ({ setBldg }: { setBldg: any }) => {
     if (yIntrinsicDampingChecked)
       setyIntrinsicDamping(fix3(outputs.ZetaY * 100));
     // kips / tonnes
-    if (xModalMassChecked) setxModalMass(fix3(outputs.WX / 1000));
-    if (yModalMassChecked) setyModalMass(fix3(outputs.WY / 1000));
+    if (xModalMassChecked) setxModalMass(fix3(outputs.WX / 1000)); // TODO: Units check
+    if (yModalMassChecked) setyModalMass(fix3(outputs.WY / 1000)); // TODO: Units check
 
     if (!xOption) {
       // Acceleration Reduction is given, Calculate ZetaTotal
