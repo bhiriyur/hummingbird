@@ -14,10 +14,6 @@ interface TabPanelProps {
   index: number;
 }
 
-interface StringProps {
-  calclogs: string;
-}
-
 function TabPanel(props: TabPanelProps) {
   const { children, value, index, ...other } = props;
 
@@ -43,7 +39,7 @@ function a11yProps(index: number) {
   };
 }
 
-function ShowCalcLogs(props: StringProps) {
+function ShowCalcLogs(props: buildingProps) {
   return (
     <div
       id={"calc-logs"}
@@ -60,7 +56,7 @@ function ShowCalcLogs(props: StringProps) {
         padding: "5px",
       }}
     >
-      {props.calclogs}
+      {props.LOGS || ""}
     </div>
   );
 }
@@ -95,7 +91,7 @@ const ViewTabs = (props: buildingProps) => {
         <DamperY {...props} />
       </TabPanel>
       <TabPanel value={value} index={3}>
-        <ShowCalcLogs calclogs={props.LOGS || ""} />
+        <ShowCalcLogs {...props} />
       </TabPanel>
     </Card>
   );
