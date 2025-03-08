@@ -15,7 +15,7 @@ import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 
 import { useEffect, useState } from "react";
-import * as calcs from "../calcs/calcs";
+import * as calcs from "../_calcs/calcs";
 
 const VARIANT = "outlined";
 const INPUTSCOLOR = "#FEFEFE";
@@ -213,7 +213,8 @@ const BuildingForm = ({setBldg} : {setBldg: any}) => {
     xTotalDamping,
     yTotalDamping,
     xOption,
-    yOption
+    yOption,
+    setBldg
   ]);
 
   return (
@@ -239,7 +240,6 @@ const BuildingForm = ({setBldg} : {setBldg: any}) => {
                   fullWidth
                   value={numFloors}
                   onChange={(e) => {
-                    console.log(e.target.value);
                     setNumFloors(Number(e.target.value));
                   }}
                   id="bldgFloors"
