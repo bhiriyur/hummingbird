@@ -6,21 +6,16 @@ import * as THREE from "three";
 import { buildingProps } from "../common/types";
 
 export const DamperX = (props: buildingProps) => {
-  const { BX, BY, BZ, N } = props;
-  const BZF = BZ / N;
+  const { BX, BY, BZ } = props;
   const dia = props?.CYLDIA ? props.CYLDIA : 1.0;
 
   const TopModuleX = props?.XLOC == "In Modules" ? true : false;
-
-  // Center of roof top
-  const origin = [0, 0, 0];
-
   const NX = props?.XLOC == "On Roof" ? props.NCYLX : 0;
   const LX = props?.LCYLX ? props.LCYLX : 40;
 
   const cylsX = [];
   for (let i = 0; i < (NX || 0); i++) {
-    cylsX.push(new THREE.Vector3(origin[0], origin[1] + i * dia, origin[2]));
+    cylsX.push(new THREE.Vector3(0, i * dia, 0));
   }
 
   const meshList = [];
@@ -74,21 +69,16 @@ export const DamperX = (props: buildingProps) => {
 };
 
 export const DamperY = (props: buildingProps) => {
-  const { BX, BY, BZ, N } = props;
-  const BZF = BZ / N;
+  const { BX, BY, BZ } = props;
   const dia = props?.CYLDIA ? props.CYLDIA : 1.0;
 
   const TopModuleY = props?.YLOC == "In Modules" ? true : false;
-
-  // Center of roof top
-  const origin = [0, 0, 0];
-
   const NY = props?.YLOC == "On Roof" ? props.NCYLY : 0;
   const LY = props?.LCYLY ? props.LCYLY : 40;
 
   const cylsY = [];
   for (let i = 0; i < (NY || 0); i++) {
-    cylsY.push(new THREE.Vector3(origin[0] + i * dia, origin[1], origin[2]));
+    cylsY.push(new THREE.Vector3(i * dia, 0, 0));
   }
 
   const meshList = [];
