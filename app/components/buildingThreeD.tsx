@@ -86,8 +86,8 @@ function Box(props: BuildingProps) {
   const { BX, BY, BZ, N } = props;
   const BZF = BZ / N;
 
-  let TopModuleX = props?.XLOC == "In Modules" ? true : false;
-  let TopModuleY = props?.YLOC == "In Modules" ? true : false;
+  const TopModuleX = props?.XLOC == "In Modules" ? true : false;
+  const TopModuleY = props?.YLOC == "In Modules" ? true : false;
 
   let transparent = false;
   let opacity = 1;

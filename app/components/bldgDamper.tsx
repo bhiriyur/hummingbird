@@ -10,7 +10,7 @@ export const DamperX = (props: BuildingProps) => {
   const BZF = BZ / N;
   const dia = props?.CYLDIA ? props.CYLDIA : 1.0;
 
-  let TopModuleX = props?.XLOC == "In Modules" ? true : false;
+  const TopModuleX = props?.XLOC == "In Modules" ? true : false;
 
   // Center of roof top
   const origin = [0, 0, 0];
@@ -83,7 +83,7 @@ export const DamperY = (props: BuildingProps) => {
   const BZF = BZ / N;
   const dia = props?.CYLDIA ? props.CYLDIA : 1.0;
 
-  let TopModuleY = props?.YLOC == "In Modules" ? true : false;
+  const TopModuleY = props?.YLOC == "In Modules" ? true : false;
 
   // Center of roof top
   const origin = [0, 0, 0];
