@@ -9,7 +9,7 @@ import ResponsiveAppBar from "./components/topnav";
 export default function Home() {
 
   const [bldg, setBldg] = useState({
-    BX: 40,
+    BX: 80,
     BY: 55,
     BZ: 450,
     N: 42,

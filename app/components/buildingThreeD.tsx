@@ -16,6 +16,8 @@ export interface BuildingProps {
   NCYLY?: number;
   LCYLX?: number;
   LCYLY?: number;
+  MODL?: number;
+  MODW?: number;
   LOGS: string;
 }
 
@@ -39,7 +41,7 @@ function RoofCylinders(props: BuildingProps) {
   const LX = props?.LCYLX ? props.LCYLX : 40;
 
   const cylsX = [];
-  for (let i = 0; i < (NX || 0) ; i++) {
+  for (let i = 0; i < (NX || 0); i++) {
     cylsX.push(new THREE.Vector3(origin[0], origin[1] + i * dia, origin[2]));
   }
 
@@ -51,26 +53,31 @@ function RoofCylinders(props: BuildingProps) {
     cylsY.push(new THREE.Vector3(origin[0] + i * dia, origin[1], origin[2]));
   }
 
-    
-
   return (
     <>
       {cylsX.map((pos, index) => (
         <mesh key={index} position={pos} rotation={[0, 0, Math.PI / 2]}>
           <cylinderGeometry args={[0.5 * dia, 0.5 * dia, LX, 32]} />
-          <meshStandardMaterial color={"#FA5522"} metalness={0.8} roughness={0.2}/>
+          <meshStandardMaterial
+            color={"#FA5522"}
+            metalness={0.8}
+            roughness={0.2}
+          />
           <Edges scale={1} threshold={15} color="black" renderOrder={1000} />
         </mesh>
       ))}
 
-    {cylsY.map((pos, index) => (
+      {cylsY.map((pos, index) => (
         <mesh key={index} position={pos} rotation={[0, 0, 0]}>
           <cylinderGeometry args={[0.5 * dia, 0.5 * dia, LY, 32]} />
-          <meshStandardMaterial color={"#55FA22"} metalness={0.8} roughness={0.2}/>
+          <meshStandardMaterial
+            color={"#55FA22"}
+            metalness={0.8}
+            roughness={0.2}
+          />
           <Edges scale={1} threshold={15} color="black" renderOrder={1000} />
         </mesh>
       ))}
-
     </>
   );
 }
@@ -79,9 +86,19 @@ function Box(props: BuildingProps) {
   const { BX, BY, BZ, N } = props;
   const BZF = BZ / N;
 
+  let TopModuleX = props?.XLOC == "In Modules" ? true : false;
+  let TopModuleY = props?.YLOC == "In Modules" ? true : false;
+
+  let transparent = false;
+  let opacity = 1;
+
   // Build Box List
   const boxList = [];
   for (let i = 0; i < N; i++) {
+    if (i === N - 1 && (TopModuleX || TopModuleY)) {
+      transparent = true;
+      opacity = 0.5;
+    }
     boxList.push(
       <mesh
         key={"Box" + i}
@@ -90,12 +107,47 @@ function Box(props: BuildingProps) {
         position={[0.5 * BX, 0.5 * BY, (i + 0.5) * BZF]}
       >
         <boxGeometry args={[BX, BY, BZF]} />
-        <meshStandardMaterial color={"orange"} />
+        <meshStandardMaterial
+          transparent={transparent}
+          opacity={opacity}
+          color={"orange"}
+        />
         <Edges scale={1} threshold={15} color="black" renderOrder={1000} />
       </mesh>
     );
   }
 
+  // Add Module X
+  if (TopModuleX) {
+    boxList.push(
+      <mesh
+        key={"BoxModuleX"}
+        {...props}
+        scale={1}
+        position={[0.5 * BX, 0.5 * BY, BZ - 0.5 * BZF]}
+      >
+        <boxGeometry args={[props.MODL, props.MODW, 0.9 * BZF]} />
+        <meshStandardMaterial color={"red"} />
+        <Edges scale={1} threshold={15} color="black" renderOrder={1000} />
+      </mesh>
+    );
+  }
+
+  // Add Module Y
+  if (TopModuleY) {
+    boxList.push(
+      <mesh
+        key={"BoxModuleX"}
+        {...props}
+        scale={1}
+        position={[0.5 * BX, 0.5 * BY, BZ - 0.5 * BZF]}
+      >
+        <boxGeometry args={[props.MODW, props.MODL, BZF]} />
+        <meshStandardMaterial color={"green"} />
+        <Edges scale={1} threshold={15} color="black" renderOrder={1000} />
+      </mesh>
+    );
+  }
   return <>{boxList}</>;
 }
 

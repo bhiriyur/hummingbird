@@ -26,8 +26,8 @@ const fix3 = (val: number) => Math.round(val * 1e3) / 1e3;
 
 const bldgProps: calcs.building_properties = {
   N: 42,
-  BX: 40,
-  BY: 40,
+  BX: 80,
+  BY: 55,
   H: 450,
 };
 
@@ -68,18 +68,18 @@ const BuildingForm = ({setBldg} : {setBldg: any}) => {
   const [bldgSystem, setbldgSystem] = useState(systems[0]);
 
   const [xPeriodChecked, setxPeriodChecked] = useState(true);
-  const [xPeriod, setxPeriod] = useState(4.5);
+  const [xPeriod, setxPeriod] = useState(bldgProps?.TX || 4.5);
 
   const [yPeriodChecked, setyPeriodChecked] = useState(true);
-  const [yPeriod, setyPeriod] = useState(4.0);
+  const [yPeriod, setyPeriod] = useState(bldgProps?.TY || 4.5);
 
   const [xIntrinsicDampingChecked, setxIntrinsicDampingChecked] =
     useState(true);
-  const [xIntrinsicDamping, setxIntrinsicDamping] = useState(0.7);
+  const [xIntrinsicDamping, setxIntrinsicDamping] = useState(bldgProps?.ZetaX || 0.7);
 
   const [yIntrinsicDampingChecked, setyIntrinsicDampingChecked] =
     useState(true);
-  const [yIntrinsicDamping, setyIntrinsicDamping] = useState(0.7);
+  const [yIntrinsicDamping, setyIntrinsicDamping] = useState(bldgProps?.ZetaY || 0.7);
 
   const [xModalMassChecked, setxModalMassChecked] = useState(true);
   const [xModalMass, setxModalMass] = useState(2000);
@@ -91,12 +91,12 @@ const BuildingForm = ({setBldg} : {setBldg: any}) => {
   const locations = ["On Roof", "In Modules"];
   const [xDamperLocation, setxDamperLocation] = useState(locations[0]);
   const [yDamperLocation, setyDamperLocation] = useState(locations[1]);
-  const [xAccelReduction, setxAccelReduction] = useState(40);
-  const [yAccelReduction, setyAccelReduction] = useState(30);
+  const [xAccelReduction, setxAccelReduction] = useState(damperProps?.AccRedX);
+  const [yAccelReduction, setyAccelReduction] = useState(damperProps?.AccRedY);
   const [xTotalDamping, setxTotalDamping] = useState(1.5);
   const [yTotalDamping, setyTotalDamping] = useState(1.2);
-  const [moduleLength, setmoduleLength] = useState(20);
-  const [moduleWidth, setmoduleWidth] = useState(8);
+  const [moduleLength, setmoduleLength] = useState(damperProps?.ModL || 20);
+  const [moduleWidth, setmoduleWidth] = useState(damperProps?.ModW || 8);
 
   const [xOption, setXOption] = useState(false);
   const [yOption, setYOption] = useState(false);
@@ -154,6 +154,8 @@ const BuildingForm = ({setBldg} : {setBldg: any}) => {
       YLOC: yDamperLocation,
       NCYLY: outputs.NCYLY,
       LCYLY: outputs.LCYLY,
+      MODL: moduleLength,
+      MODW: moduleWidth,
       LOGS: outputs.CalcLogs
     });
 
@@ -190,6 +192,8 @@ const BuildingForm = ({setBldg} : {setBldg: any}) => {
     bldgXwidth,
     bldgYwidth,
     bldgSystem,
+    moduleLength,
+    moduleWidth,
     xPeriod,
     yPeriod,
     xIntrinsicDamping,

@@ -4,9 +4,8 @@ import Card from "@mui/material/Card";
 import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
 import * as React from "react";
-import Dampers from "./bldgDamper";
+import DamperX, { DamperY } from "./bldgDamper";
 import { BuildingProps, BuildingThreeD } from "./buildingThreeD";
-import ThreeDVisualization from "./testCylinders";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -57,7 +56,7 @@ function ShowCalcLogs(props: StringProps) {
         color: "white",
         fontFamily: "monospace",
         fontSize: "medium",
-        padding: "5px"
+        padding: "5px",
       }}
     >
       {props.calclogs}
@@ -89,17 +88,10 @@ const MyCanvas = (props: BuildingProps) => {
         <BuildingThreeD {...props}></BuildingThreeD>
       </TabPanel>
       <TabPanel value={value} index={1}>
-        <ThreeDVisualization></ThreeDVisualization>
+        <DamperX {...props} />
       </TabPanel>
       <TabPanel value={value} index={2}>
-        <Dampers
-          type={1}
-          orientation={"X"}
-          dia={1}
-          length={40}
-          n1={1}
-          n2={2}
-        ></Dampers>
+        <DamperY {...props} />
       </TabPanel>
       <TabPanel value={value} index={3}>
         <ShowCalcLogs calclogs={props.LOGS} />

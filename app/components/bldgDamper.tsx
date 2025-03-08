@@ -3,62 +3,65 @@
 import { Edges, OrbitControls } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import * as THREE from "three";
+import { BuildingProps } from "./buildingThreeD";
 
-interface DamperSettings {
-  pos?: number[];
-  type: number; // 1 = roof, 2 = module
-  orientation: string; // Longitudinal orientation (X, Y or Z)
-  Lmod?: number;
-  Wmod?: number;
-  dia: number;
-  length: number;
-  n1: number;
-  n2: number;
-}
+export const DamperX = (props: BuildingProps) => {
+  const { BX, BY, BZ, N } = props;
+  const BZF = BZ / N;
+  const dia = props?.CYLDIA ? props.CYLDIA : 1.0;
 
-const Cylinders = (config: DamperSettings) => {
-  // Draw the cylinders only
-  const position = config?.pos ? config.pos : [0, 0, 0];
-  const { n1, n2, dia, length, orientation } = config;
-  const delta = 2;
-  const cyls = [];
-  let pos;
-  for (let i = 0; i < n1; i++) {
-    pos = [...position];
-    pos[0] += i * dia + delta;
-    for (let j = 0; j < n2; j++) {
-      pos[1] = j * dia + delta;
-      cyls.push(new THREE.Vector3(...pos));
-    }
+  let TopModuleX = props?.XLOC == "In Modules" ? true : false;
+
+  // Center of roof top
+  const origin = [0, 0, 0];
+
+  const NX = props?.XLOC == "On Roof" ? props.NCYLX : 0;
+  const LX = props?.LCYLX ? props.LCYLX : 40;
+
+  const cylsX = [];
+  for (let i = 0; i < (NX || 0); i++) {
+    cylsX.push(new THREE.Vector3(origin[0], origin[1] + i * dia, origin[2]));
+  }
+
+  const meshList = [];
+
+  if (TopModuleX) {
+    // Box Module
+    meshList.push(
+      <mesh
+        key={"BoxModuleX"}
+        {...props}
+        scale={1}
+        position={[0, 0, 0]}
+      >
+        <boxGeometry args={[props.MODL, props.MODW, 0.9 * BZF]} />
+        <meshStandardMaterial color={"red"} />
+        <Edges scale={1} threshold={15} color="black" renderOrder={1000} />
+      </mesh>
+    );
+  } else {
+    // Cylinders
+    cylsX.map((pos, index) => {
+      meshList.push(
+        <mesh key={index} position={pos} rotation={[0, 0, Math.PI / 2]}>
+          <cylinderGeometry args={[0.5 * dia, 0.5 * dia, LX, 32]} />
+          <meshStandardMaterial
+            color={"#FA5522"}
+            metalness={0.8}
+            roughness={0.2}
+          />
+          <Edges scale={1} threshold={15} color="black" renderOrder={1000} />
+        </mesh>
+      );
+    });
   }
 
   return (
-    <>
-      {cyls.map((pos, index) => (
-        <mesh
-          key={index}
-          position={pos}
-          rotation={
-            orientation == "X" ? [Math.PI / 2, 0, 0] : [0, Math.PI / 2, 0]
-          }
-        >
-          <cylinderGeometry args={[0.5 * dia, 0.5 * dia, length, 32]} />
-          <meshStandardMaterial color={"red"} />
-          <Edges scale={1} threshold={15} color="black" renderOrder={1000} />
-        </mesh>
-      ))}
-    </>
-  );
-};
-
-const Dampers = (config: DamperSettings) => {
-  return (
     <Canvas
-      gl={{preserveDrawingBuffer:true}}
-      orthographic
+      gl={{ preserveDrawingBuffer: true }}
       camera={{
-        position: [30, 30, 30],
-        zoom: 20
+        up: [0, 0, 1],
+        position: [0.75 * BX, 0.75 * BX, 10],
       }}
       style={{
         width: "100%",
@@ -66,13 +69,87 @@ const Dampers = (config: DamperSettings) => {
         backgroundColor: "#f0f0f0",
       }}
     >
-      <ambientLight intensity={0.9} />
-      <Cylinders {...config} />
+      <ambientLight intensity={2} />
+      <pointLight intensity={80000} position={[2 * BX, 2 * BY, 0.2 * BZ]} />
 
-      <pointLight position={[10, 10, 10]} />
+      {meshList}
       <OrbitControls />
     </Canvas>
   );
 };
 
-export default Dampers;
+export const DamperY = (props: BuildingProps) => {
+  const { BX, BY, BZ, N } = props;
+  const BZF = BZ / N;
+  const dia = props?.CYLDIA ? props.CYLDIA : 1.0;
+
+  let TopModuleY = props?.YLOC == "In Modules" ? true : false;
+
+  // Center of roof top
+  const origin = [0, 0, 0];
+
+  const NY = props?.YLOC == "On Roof" ? props.NCYLY : 0;
+  const LY = props?.LCYLY ? props.LCYLY : 40;
+
+  const cylsY = [];
+  for (let i = 0; i < (NY || 0); i++) {
+    cylsY.push(new THREE.Vector3(origin[0] + i * dia, origin[1], origin[2]));
+  }
+
+  const meshList = [];
+
+  if (TopModuleY) {
+    // Box Module
+    meshList.push(
+      <mesh
+        key={"BoxModuleY"}
+        {...props}
+        scale={1}
+        position={[0.5 * (props?.MODW || 10), 0.5 * (props?.MODL || 10), 0.5 * BZF]}
+      >
+        <boxGeometry args={[props.MODW, props.MODL, 4]} />
+        <meshStandardMaterial color={"green"} />
+        <Edges scale={1} threshold={15} color="black" renderOrder={1000} />
+      </mesh>
+    );
+  } else {
+    // Cylinders
+    cylsY.map((pos, index) => {
+      meshList.push(
+        <mesh key={index} position={pos} rotation={[0, 0, 0]}>
+          <cylinderGeometry args={[0.5 * dia, 0.5 * dia, LY, 32]} />
+          <meshStandardMaterial
+            color={"#55FA22"}
+            metalness={0.8}
+            roughness={0.2}
+          />
+          <Edges scale={1} threshold={15} color="black" renderOrder={1000} />
+        </mesh>
+      );
+    });
+  }
+
+  return (
+    <Canvas
+      gl={{ preserveDrawingBuffer: true }}
+      camera={{
+        up: [0, 0, 1],
+        position: [0.75 * BY, 0.75 * BY, 10],
+      }}
+      style={{
+        width: "100%",
+        height: "100%",
+        backgroundColor: "#f0f0f0",
+      }}
+    >
+      <ambientLight intensity={2} />
+      <pointLight intensity={80000} position={[2 * BX, 2 * BY, 0.2 * BZ]} />
+
+      {meshList}
+      <OrbitControls />
+    </Canvas>
+  );
+};
+
+
+export default DamperX;
