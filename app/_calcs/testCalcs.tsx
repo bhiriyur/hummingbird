@@ -1,20 +1,18 @@
-import {
-  BldgDynamics,
-  building_properties,
-  damper_properties,
-  output_properties,
-} from "./calcs";
+import { buildingProps, damperProps, outputProps } from "../common/types";
 
-const bldgProps: building_properties = {
+import { BldgDynamics } from "./calcs";
+
+const building: buildingProps = {
   N: 42,
-  H: 400,
+  BZ: 400,
   BX: 80,
   BY: 55,
   units: 1,
   S: 1,
+  LOGS: "",
 };
 
-const damperProps: damper_properties = {
+const damper: damperProps = {
   LocX: 2,
   LocY: 2,
   ModL: 20,
@@ -27,6 +25,6 @@ const damperProps: damper_properties = {
   OptionY: false,
 };
 
-const op: output_properties = BldgDynamics(bldgProps, damperProps);
+const output: outputProps = BldgDynamics(building, damper);
 
-console.log("Output = ", op);
+console.log("Output = ", output);

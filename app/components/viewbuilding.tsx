@@ -3,23 +3,7 @@
 import { Edges, OrbitControls } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import * as THREE from "three";
-
-export interface BuildingProps {
-  BX: number;
-  BY: number;
-  BZ: number;
-  N: number;
-  CYLDIA?: number;
-  XLOC?: string;
-  YLOC?: string;
-  NCYLX?: number;
-  NCYLY?: number;
-  LCYLX?: number;
-  LCYLY?: number;
-  MODL?: number;
-  MODW?: number;
-  LOGS: string;
-}
+import { buildingProps } from "../common/types";
 
 function XZGrid() {
   const size = 100;
@@ -30,7 +14,7 @@ function XZGrid() {
   );
 }
 
-function RoofCylinders(props: BuildingProps) {
+function RoofCylinders(props: buildingProps) {
   // Render Roof cylinder elements
   const { BX, BY, BZ } = props;
   const dia = props?.CYLDIA ? props.CYLDIA : 1.0;
@@ -82,7 +66,7 @@ function RoofCylinders(props: BuildingProps) {
   );
 }
 
-function Box(props: BuildingProps) {
+function Box(props: buildingProps) {
   const { BX, BY, BZ, N } = props;
   const BZF = BZ / N;
 
@@ -137,7 +121,7 @@ function Box(props: BuildingProps) {
   if (TopModuleY) {
     boxList.push(
       <mesh
-        key={"BoxModuleX"}
+        key={"BoxModuleY"}
         {...props}
         scale={1}
         position={[0.5 * BX, 0.5 * BY, BZ - 0.5 * BZF]}
@@ -151,7 +135,7 @@ function Box(props: BuildingProps) {
   return <>{boxList}</>;
 }
 
-export const BuildingThreeD = (props: BuildingProps) => {
+export const BuildingThreeD = (props: buildingProps) => {
   const { BX, BY, BZ } = props;
 
   return (

@@ -3,9 +3,9 @@
 import { Edges, OrbitControls } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import * as THREE from "three";
-import { BuildingProps } from "./buildingThreeD";
+import { buildingProps } from "../common/types";
 
-export const DamperX = (props: BuildingProps) => {
+export const DamperX = (props: buildingProps) => {
   const { BX, BY, BZ, N } = props;
   const BZF = BZ / N;
   const dia = props?.CYLDIA ? props.CYLDIA : 1.0;
@@ -28,13 +28,8 @@ export const DamperX = (props: BuildingProps) => {
   if (TopModuleX) {
     // Box Module
     meshList.push(
-      <mesh
-        key={"BoxModuleX"}
-        {...props}
-        scale={1}
-        position={[0, 0, 0]}
-      >
-        <boxGeometry args={[props.MODL, props.MODW, 0.9 * BZF]} />
+      <mesh key={"BoxModuleX"} {...props} scale={1} position={[0, 0, 0]}>
+        <boxGeometry args={[props.MODL, props.MODW, 4]} />
         <meshStandardMaterial color={"red"} />
         <Edges scale={1} threshold={15} color="black" renderOrder={1000} />
       </mesh>
@@ -78,7 +73,7 @@ export const DamperX = (props: BuildingProps) => {
   );
 };
 
-export const DamperY = (props: BuildingProps) => {
+export const DamperY = (props: buildingProps) => {
   const { BX, BY, BZ, N } = props;
   const BZF = BZ / N;
   const dia = props?.CYLDIA ? props.CYLDIA : 1.0;
@@ -101,12 +96,7 @@ export const DamperY = (props: BuildingProps) => {
   if (TopModuleY) {
     // Box Module
     meshList.push(
-      <mesh
-        key={"BoxModuleY"}
-        {...props}
-        scale={1}
-        position={[0.5 * (props?.MODW || 10), 0.5 * (props?.MODL || 10), 0.5 * BZF]}
-      >
+      <mesh key={"BoxModuleY"} {...props} scale={1} position={[0, 0, 0]}>
         <boxGeometry args={[props.MODW, props.MODL, 4]} />
         <meshStandardMaterial color={"green"} />
         <Edges scale={1} threshold={15} color="black" renderOrder={1000} />
@@ -150,6 +140,3 @@ export const DamperY = (props: BuildingProps) => {
     </Canvas>
   );
 };
-
-
-export default DamperX;

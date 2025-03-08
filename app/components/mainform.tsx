@@ -16,6 +16,7 @@ import Typography from "@mui/material/Typography";
 
 import { useEffect, useState } from "react";
 import * as calcs from "../_calcs/calcs";
+import { buildingProps, damperProps } from "../common/types";
 
 const VARIANT = "outlined";
 const INPUTSCOLOR = "#FEFEFE";
@@ -24,14 +25,14 @@ const BGCOLOR = "#FEFEFE";
 
 const fix3 = (val: number) => Math.round(val * 1e3) / 1e3;
 
-const bldgProps: calcs.building_properties = {
+const building: buildingProps = {
   N: 42,
   BX: 80,
   BY: 55,
-  H: 450,
+  BZ: 450,
 };
 
-const damperProps: calcs.damper_properties = {
+const damper: damperProps = {
   LocX: 1,
   LocY: 2,
   ModL: 40,
@@ -44,22 +45,21 @@ const damperProps: calcs.damper_properties = {
   OptionY: true,
 };
 
-
 const recalculate = () => {
   console.log("Recalculating...");
-  return calcs.BldgDynamics(bldgProps, damperProps);
+  return calcs.BldgDynamics(building, damper);
 };
 
-const BuildingForm = ({setBldg} : {setBldg: any}) => {
+const BuildingForm = ({ setBldg }: { setBldg: any }) => {
   const units = {
     force: "kips",
     length: "ft",
     time: "s",
   };
-  const [numFloors, setNumFloors] = useState(bldgProps.N);
-  const [bldgHeight, setbldgHeight] = useState(bldgProps.H);
-  const [bldgXwidth, setbldgXwidth] = useState(bldgProps.BX);
-  const [bldgYwidth, setbldgYwidth] = useState(bldgProps.BY);
+  const [numFloors, setNumFloors] = useState(building.N);
+  const [bldgHeight, setbldgHeight] = useState(building.BZ);
+  const [bldgXwidth, setbldgXwidth] = useState(building.BX);
+  const [bldgYwidth, setbldgYwidth] = useState(building.BY);
   const systems = [
     "Steel moment-resisting frame",
     "Steel braced frame",
@@ -68,18 +68,22 @@ const BuildingForm = ({setBldg} : {setBldg: any}) => {
   const [bldgSystem, setbldgSystem] = useState(systems[0]);
 
   const [xPeriodChecked, setxPeriodChecked] = useState(true);
-  const [xPeriod, setxPeriod] = useState(bldgProps?.TX || 4.5);
+  const [xPeriod, setxPeriod] = useState(building?.TX || 4.5);
 
   const [yPeriodChecked, setyPeriodChecked] = useState(true);
-  const [yPeriod, setyPeriod] = useState(bldgProps?.TY || 4.5);
+  const [yPeriod, setyPeriod] = useState(building?.TY || 4.5);
 
   const [xIntrinsicDampingChecked, setxIntrinsicDampingChecked] =
     useState(true);
-  const [xIntrinsicDamping, setxIntrinsicDamping] = useState(bldgProps?.ZetaX || 0.7);
+  const [xIntrinsicDamping, setxIntrinsicDamping] = useState(
+    building?.ZetaX || 0.7
+  );
 
   const [yIntrinsicDampingChecked, setyIntrinsicDampingChecked] =
     useState(true);
-  const [yIntrinsicDamping, setyIntrinsicDamping] = useState(bldgProps?.ZetaY || 0.7);
+  const [yIntrinsicDamping, setyIntrinsicDamping] = useState(
+    building?.ZetaY || 0.7
+  );
 
   const [xModalMassChecked, setxModalMassChecked] = useState(true);
   const [xModalMass, setxModalMass] = useState(2000);
@@ -91,12 +95,12 @@ const BuildingForm = ({setBldg} : {setBldg: any}) => {
   const locations = ["On Roof", "In Modules"];
   const [xDamperLocation, setxDamperLocation] = useState(locations[0]);
   const [yDamperLocation, setyDamperLocation] = useState(locations[1]);
-  const [xAccelReduction, setxAccelReduction] = useState(damperProps?.AccRedX);
-  const [yAccelReduction, setyAccelReduction] = useState(damperProps?.AccRedY);
+  const [xAccelReduction, setxAccelReduction] = useState(damper?.AccRedX);
+  const [yAccelReduction, setyAccelReduction] = useState(damper?.AccRedY);
   const [xTotalDamping, setxTotalDamping] = useState(1.5);
   const [yTotalDamping, setyTotalDamping] = useState(1.2);
-  const [moduleLength, setmoduleLength] = useState(damperProps?.ModL || 20);
-  const [moduleWidth, setmoduleWidth] = useState(damperProps?.ModW || 8);
+  const [moduleLength, setmoduleLength] = useState(damper?.ModL || 20);
+  const [moduleWidth, setmoduleWidth] = useState(damper?.ModW || 8);
 
   const [xOption, setXOption] = useState(false);
   const [yOption, setYOption] = useState(false);
@@ -111,36 +115,36 @@ const BuildingForm = ({setBldg} : {setBldg: any}) => {
     ];
     const locations = ["On Roof", "In Modules"];
 
-    bldgProps.N = numFloors;
-    bldgProps.H = bldgHeight;
-    bldgProps.BX = bldgXwidth;
-    bldgProps.BY = bldgYwidth;
-    bldgProps.S = systems.indexOf(bldgSystem) + 1;
+    building.N = numFloors;
+    building.BZ = bldgHeight;
+    building.BX = bldgXwidth;
+    building.BY = bldgYwidth;
+    building.S = systems.indexOf(bldgSystem) + 1;
 
-    if (!xPeriodChecked) bldgProps.TX = xPeriod;
-    if (!xIntrinsicDampingChecked) bldgProps.ZetaX = xIntrinsicDamping / 100;
-    if (!xModalMassChecked) bldgProps.WX = xModalMass * 1000;
-    if (!yPeriodChecked) bldgProps.TY = yPeriod;
-    if (!yIntrinsicDampingChecked) bldgProps.ZetaY = yIntrinsicDamping / 100;
-    if (!yModalMassChecked) bldgProps.WY = yModalMass * 1000;
+    if (!xPeriodChecked) building.TX = xPeriod;
+    if (!xIntrinsicDampingChecked) building.ZetaX = xIntrinsicDamping / 100;
+    if (!xModalMassChecked) building.WX = xModalMass * 1000;
+    if (!yPeriodChecked) building.TY = yPeriod;
+    if (!yIntrinsicDampingChecked) building.ZetaY = yIntrinsicDamping / 100;
+    if (!yModalMassChecked) building.WY = yModalMass * 1000;
 
-    damperProps.LocX = locations.indexOf(xDamperLocation);
-    damperProps.LocY = locations.indexOf(yDamperLocation);
-    damperProps.ModL = moduleLength;
-    damperProps.ModW = moduleWidth;
-    damperProps.AccRedX = xAccelReduction / 100;
-    damperProps.AccRedY = yAccelReduction / 100;
-    damperProps.ZetaTotalX = xTotalDamping / 100;
-    damperProps.ZetaTotalY = yTotalDamping / 100;
-    damperProps.OptionX = xOption;
-    damperProps.OptionY = yOption;
+    damper.LocX = locations.indexOf(xDamperLocation);
+    damper.LocY = locations.indexOf(yDamperLocation);
+    damper.ModL = moduleLength;
+    damper.ModW = moduleWidth;
+    damper.AccRedX = xAccelReduction / 100;
+    damper.AccRedY = yAccelReduction / 100;
+    damper.ZetaTotalX = xTotalDamping / 100;
+    damper.ZetaTotalY = yTotalDamping / 100;
+    damper.OptionX = xOption;
+    damper.OptionY = yOption;
 
-    console.log("BUILDING CHANGED: ", bldgProps);
-    console.log("DAMPER CHANGED: ", damperProps);
-    
+    console.log("BUILDING CHANGED: ", building);
+    console.log("DAMPER CHANGED: ", damper);
+
     // Recalculate and update values
     const outputs = recalculate();
-    
+
     // Set increment count
     setBldg({
       N: numFloors,
@@ -156,7 +160,7 @@ const BuildingForm = ({setBldg} : {setBldg: any}) => {
       LCYLY: outputs.LCYLY,
       MODL: moduleLength,
       MODW: moduleWidth,
-      LOGS: outputs.CalcLogs
+      LOGS: outputs.CalcLogs,
     });
 
     console.log("OUTPUTS: ", outputs);
@@ -164,8 +168,10 @@ const BuildingForm = ({setBldg} : {setBldg: any}) => {
     if (xPeriodChecked) setxPeriod(fix3(outputs.TX));
     if (yPeriodChecked) setyPeriod(fix3(outputs.TY));
     // Percent values
-    if (xIntrinsicDampingChecked) setxIntrinsicDamping(fix3(outputs.ZetaX * 100));
-    if (yIntrinsicDampingChecked) setyIntrinsicDamping(fix3(outputs.ZetaY * 100));
+    if (xIntrinsicDampingChecked)
+      setxIntrinsicDamping(fix3(outputs.ZetaX * 100));
+    if (yIntrinsicDampingChecked)
+      setyIntrinsicDamping(fix3(outputs.ZetaY * 100));
     // kips / tonnes
     if (xModalMassChecked) setxModalMass(fix3(outputs.WX / 1000));
     if (yModalMassChecked) setyModalMass(fix3(outputs.WY / 1000));
@@ -175,7 +181,7 @@ const BuildingForm = ({setBldg} : {setBldg: any}) => {
       setxTotalDamping(fix3(outputs.ZetaTotalX * 100));
     } else {
       // ZetaTotal given, Calculate Acceleration Reduction
-      setxAccelReduction(fix3(outputs.AccRedX * 100));      
+      setxAccelReduction(fix3(outputs.AccRedX * 100));
     }
 
     if (!yOption) {
@@ -185,7 +191,6 @@ const BuildingForm = ({setBldg} : {setBldg: any}) => {
       // ZetaTotal given, Calculate Acceleration Reduction
       setyAccelReduction(fix3(outputs.AccRedY * 100));
     }
-
   }, [
     numFloors,
     bldgHeight,
@@ -214,7 +219,7 @@ const BuildingForm = ({setBldg} : {setBldg: any}) => {
     yTotalDamping,
     xOption,
     yOption,
-    setBldg
+    setBldg,
   ]);
 
   return (
@@ -333,7 +338,7 @@ const BuildingForm = ({setBldg} : {setBldg: any}) => {
                   slotProps={{
                     input: { id: "select-struc-system" },
                     inputLabel: { htmlFor: "select-struc-system" },
-                  }}                  
+                  }}
                   variant={VARIANT}
                   style={{ backgroundColor: INPUTSCOLOR }}
                 >
@@ -692,7 +697,7 @@ const BuildingForm = ({setBldg} : {setBldg: any}) => {
                   slotProps={{
                     input: { id: "select-xdamper-loc" },
                     inputLabel: { htmlFor: "select-xdamper-loc" },
-                  }}                   
+                  }}
                 >
                   {locations.map((system) => (
                     <MenuItem key={system} value={system}>
@@ -802,7 +807,7 @@ const BuildingForm = ({setBldg} : {setBldg: any}) => {
                   slotProps={{
                     input: { id: "select-ydamper-loc" },
                     inputLabel: { htmlFor: "select-ydamper-loc" },
-                  }}                   
+                  }}
                 >
                   {locations.map((system) => (
                     <MenuItem key={system} value={system}>

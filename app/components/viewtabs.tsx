@@ -4,8 +4,9 @@ import Card from "@mui/material/Card";
 import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
 import * as React from "react";
-import DamperX, { DamperY } from "./bldgDamper";
-import { BuildingProps, BuildingThreeD } from "./buildingThreeD";
+import { buildingProps } from "../common/types";
+import { BuildingThreeD } from "./viewbuilding";
+import { DamperX, DamperY } from "./viewdampers";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -64,7 +65,7 @@ function ShowCalcLogs(props: StringProps) {
   );
 }
 
-const MyCanvas = (props: BuildingProps) => {
+const ViewTabs = (props: buildingProps) => {
   const [value, setValue] = React.useState(0);
 
   return (
@@ -94,10 +95,10 @@ const MyCanvas = (props: BuildingProps) => {
         <DamperY {...props} />
       </TabPanel>
       <TabPanel value={value} index={3}>
-        <ShowCalcLogs calclogs={props.LOGS} />
+        <ShowCalcLogs calclogs={props.LOGS || ""} />
       </TabPanel>
     </Card>
   );
 };
 
-export default MyCanvas;
+export default ViewTabs;

@@ -1,13 +1,12 @@
-"use client"
+"use client";
 
 import { Grid2 as Grid } from "@mui/material";
 import { useState } from "react";
-import BuildingForm from "./components/bldgForm";
-import MyCanvas from "./components/mycanvas";
+import BuildingForm from "./components/mainform";
 import ResponsiveAppBar from "./components/topnav";
+import ViewTabs from "./components/viewtabs";
 
 export default function Home() {
-
   const [bldg, setBldg] = useState({
     BX: 80,
     BY: 55,
@@ -16,10 +15,8 @@ export default function Home() {
     CYLDIA: 5,
     NCYLX: 3,
     LCYLX: 40,
-    LOGS: ""
-  })
-
-  console.log("BUILDING bldg", bldg)
+    LOGS: "",
+  });
 
   return (
     <main>
@@ -29,7 +26,7 @@ export default function Home() {
           <BuildingForm setBldg={setBldg}></BuildingForm>
         </Grid>
         <Grid size={6}>
-          <MyCanvas {...bldg}></MyCanvas>
+          <ViewTabs {...bldg}></ViewTabs>
         </Grid>
       </Grid>
     </main>

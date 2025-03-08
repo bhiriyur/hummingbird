@@ -1,3 +1,5 @@
+import { buildingProps, damperProps, outputProps } from "../common/types";
+
 export const CONSTANTS = {
   RhoBuild: 192.22156048751998, // kg/m^3 Nominal density of bulding 12 lb/ft**3
   wm: 250, // Module area mass (kg / m^2)
@@ -15,55 +17,9 @@ export const CONSTANTS = {
   Patm: 1.013e5, // N / m**2 (1 atm)
 };
 
-export interface building_properties {
-  N: number; // number of floors
-  H: number; // Building Height
-  BX: number; // Building X- Width
-  BY: number; // Building Y - Width
-  units?: number; // Unit system 1 = US, 2 = SI (default = SI)
-  S?: number; // Structural System (default = 1)
-  TX?: number;
-  TY?: number;
-  ZetaX?: number;
-  ZetaY?: number;
-  WX?: number;
-  WY?: number;
-}
-
-export interface damper_properties {
-  LocX: number;
-  LocY: number;
-  ModL: number; // Module Length
-  ModW: number; // Module width
-  AccRedX: number; // acc reduction X
-  AccRedY: number; // acc reduction Y
-  ZetaTotalX: number; // total damping X
-  ZetaTotalY: number; // total damping Y
-  OptionX: boolean; // true if acc reduction is input
-  OptionY: boolean; // false if total damping is input
-}
-
-export interface output_properties {
-  TX: number;
-  TY: number;
-  ZetaX: number;
-  ZetaY: number;
-  WX: number;
-  WY: number;
-  AccRedX: number; // acc reduction X
-  AccRedY: number; // acc reduction Y
-  ZetaTotalX: number; // total damping X
-  ZetaTotalY: number; // total damping Y
-  NCYLX: number; // Number of Cylinders X
-  LCYLX: number; // Length of Cylinders X
-  NCYLY: number; // Number of Cylinders Y
-  LCYLY: number; // Length of Cylinders Y
-  CalcLogs: string;
-}
-
 const writeLog = (...args: any[]) => {
   let output = "";
-  
+
   output += args[0];
   for (let i = 1; i < args.length; i++) {
     output += String(args[i]) + (i < args.length - 1 ? ", " : "");
@@ -75,19 +31,20 @@ const writeLog = (...args: any[]) => {
 };
 
 export const BldgDynamics = (
-  bldgProps: building_properties,
-  damperProps: damper_properties
-): output_properties => {
+  building: buildingProps,
+  damper: damperProps
+): outputProps => {
   // US -> SI
   const ft2m = (e: number) => 0.3048 * e;
   // const kgs2lbs = (e: number) => 2.205 * e;
 
-  let { BX, BY, H } = bldgProps;
-  const { N, units, S } = bldgProps;
-  let { ModL, ModW, AccRedX, AccRedY, ZetaTotalX, ZetaTotalY } = damperProps;
-  const { LocX, LocY, OptionX, OptionY } = damperProps;
+  let { BX, BY, BZ: H } = building;
+  const { N, units, S } = building;
+  let { ModL, ModW, AccRedX, AccRedY, ZetaTotalX, ZetaTotalY } = damper;
+  const { LocX, LocY, OptionX, OptionY } = damper;
 
-  let FullLog = "NOTE: INPUTS PROVIDED IN US UNITS.\nALL CALCULATIONS ARE PERFORMED IN SI UNITS.\n\n";
+  let FullLog =
+    "NOTE: INPUTS PROVIDED IN US UNITS.\nALL CALCULATIONS ARE PERFORMED IN SI UNITS.\n\n";
 
   if (units === 1) {
     BX = ft2m(BX);
@@ -119,10 +76,10 @@ export const BldgDynamics = (
   }
 
   // User override?
-  TX = bldgProps.TX ? bldgProps.TX : TX;
-  TY = bldgProps.TY ? bldgProps.TY : TY;
-  ZetaX = bldgProps.ZetaX ? bldgProps.ZetaX : ZetaX;
-  ZetaY = bldgProps.ZetaY ? bldgProps.ZetaY : ZetaY;
+  TX = building.TX ? building.TX : TX;
+  TY = building.TY ? building.TY : TY;
+  ZetaX = building.ZetaX ? building.ZetaX : ZetaX;
+  ZetaY = building.ZetaY ? building.ZetaY : ZetaY;
 
   // // Based on mathcad calcs
   // TX = H / (ft2m(10) * 10);
@@ -152,8 +109,8 @@ export const BldgDynamics = (
     CONSTANTS.wm * (N * BX * BY) + CONSTANTS.wf * (2 * BX + 2 * BY) * H;
 
   // Modal Mass (tonnes / kips)
-  const WX = bldgProps.WX ? bldgProps.WX : Beta(H, BX) * Wb;
-  const WY = bldgProps.WY ? bldgProps.WY : Beta(H, BY) * Wb;
+  const WX = building.WX ? building.WX : Beta(H, BX) * Wb;
+  const WY = building.WY ? building.WY : Beta(H, BY) * Wb;
 
   FullLog += writeLog("Wb, WX, WY =\n", Wb, WX, WY);
 
@@ -184,17 +141,17 @@ export const BldgDynamics = (
   const AccRatioY = Math.sqrt(ZetaY / ZetaTotalY);
 
   FullLog += writeLog(
-      "ZetaX, ZetaAddHBX, ZetaTotalX =\n",
-      ZetaX,
-      ZetaAddHBX,
-      ZetaTotalX
-    );
-    FullLog += writeLog(
-      "ZetaY, ZetaAddHBY, ZetaTotalY =\n",
-      ZetaY,
-      ZetaAddHBY,
-      ZetaTotalY
-    );
+    "ZetaX, ZetaAddHBX, ZetaTotalX =\n",
+    ZetaX,
+    ZetaAddHBX,
+    ZetaTotalX
+  );
+  FullLog += writeLog(
+    "ZetaY, ZetaAddHBY, ZetaTotalY =\n",
+    ZetaY,
+    ZetaAddHBY,
+    ZetaTotalY
+  );
 
   FullLog += writeLog("AccRedX, AccRatioX = \n", AccRedX, AccRatioX);
   FullLog += writeLog("AccRedY, AccRatioY = \n", AccRedY, AccRatioY);
@@ -240,22 +197,22 @@ export const BldgDynamics = (
     (DispTargetHBY / (1 - CONSTANTS.MembraneFill)) *
     CONSTANTS.ExtraVolumeFactor;
 
-    FullLog += writeLog(
-      "totalUsefulWaterMassX, AccUndampedX, freqHBX, DispTargetBuildX, DispTargetHBX =\n",
-      totalUsefulWaterMassX,
-      AccUndampedX,
-      freqHBX,
-      DispTargetBuildX,
-      DispTargetHBX
-    );
-    FullLog += writeLog(
-      "totalUsefulWaterMassY, AccUndampedY, freqHBY, DispTargetBuildY, DispTargetHBY =\n",
-      totalUsefulWaterMassY,
-      AccUndampedY,
-      freqHBY,
-      DispTargetBuildY,
-      DispTargetHBY
-    );
+  FullLog += writeLog(
+    "totalUsefulWaterMassX, AccUndampedX, freqHBX, DispTargetBuildX, DispTargetHBX =\n",
+    totalUsefulWaterMassX,
+    AccUndampedX,
+    freqHBX,
+    DispTargetBuildX,
+    DispTargetHBX
+  );
+  FullLog += writeLog(
+    "totalUsefulWaterMassY, AccUndampedY, freqHBY, DispTargetBuildY, DispTargetHBY =\n",
+    totalUsefulWaterMassY,
+    AccUndampedY,
+    freqHBY,
+    DispTargetBuildY,
+    DispTargetHBY
+  );
 
   let MaxCylLengthX = BX;
   let MaxCylLengthY = BY;
@@ -276,18 +233,18 @@ export const BldgDynamics = (
     2 * MembrangeLengthY -
     CONSTANTS.AdditionalLongitudinalClearance;
 
-    FullLog += writeLog(
-      "MembrangeLengthX, MaxCylLengthX, CenterLengthX = \n",
-      MembrangeLengthX,
-      MaxCylLengthX,
-      CenterLengthX
-    );
-    FullLog += writeLog(
-      "MembrangeLengthY, MaxCylLengthY, CenterLengthY = \n",
-      MembrangeLengthY,
-      MaxCylLengthY,
-      CenterLengthY
-    );
+  FullLog += writeLog(
+    "MembrangeLengthX, MaxCylLengthX, CenterLengthX = \n",
+    MembrangeLengthX,
+    MaxCylLengthX,
+    CenterLengthX
+  );
+  FullLog += writeLog(
+    "MembrangeLengthY, MaxCylLengthY, CenterLengthY = \n",
+    MembrangeLengthY,
+    MaxCylLengthY,
+    CenterLengthY
+  );
 
   const AreaCenter = (Math.PI * CONSTANTS.CylDiameter ** 2) / 4.0;
   const AreaMemHor = CONSTANTS.MembraneFill * AreaCenter;
@@ -297,17 +254,17 @@ export const BldgDynamics = (
 
   FullLog += writeLog("AreaCenter, AreaMemHor =\n", AreaCenter, AreaMemHor);
   FullLog += writeLog(
-      "MaxCylLengthX, CenterLengthX, AreaMemVertX =\n",
-      MaxCylLengthX,
-      CenterLengthX,
-      AreaMemVertX
-    );
-    FullLog += writeLog(
-      "MaxCylLengthY, CenterLengthY, AreaMemVertY =\n",
-      MaxCylLengthY,
-      CenterLengthY,
-      AreaMemVertY
-    );
+    "MaxCylLengthX, CenterLengthX, AreaMemVertX =\n",
+    MaxCylLengthX,
+    CenterLengthX,
+    AreaMemVertX
+  );
+  FullLog += writeLog(
+    "MaxCylLengthY, CenterLengthY, AreaMemVertY =\n",
+    MaxCylLengthY,
+    CenterLengthY,
+    AreaMemVertY
+  );
 
   const MassCenterX = CONSTANTS.RhoWater * AreaCenter * CenterLengthX;
   const MassCenterY = CONSTANTS.RhoWater * AreaCenter * CenterLengthY;
@@ -325,20 +282,20 @@ export const BldgDynamics = (
     CONSTANTS.RhoWater * AreaCenter * CenterLengthY +
     2 * CONSTANTS.RhoWater * AreaMemHor * MembrangeLengthY;
 
-    FullLog += writeLog(
-      "MassCenterX, MassEndHorX, MassEndVertX, WaterMassPerCylinderX =\n",
-      MassCenterX,
-      MassEndHorX,
-      MassEndVertX,
-      WaterMassPerCylinderX
-    );
-    FullLog += writeLog(
-      "MassCenterY, MassEndHorY, MassEndVertY, WaterMassPerCylinderY =\n",
-      MassCenterY,
-      MassEndHorY,
-      MassEndVertY,
-      WaterMassPerCylinderY
-    );
+  FullLog += writeLog(
+    "MassCenterX, MassEndHorX, MassEndVertX, WaterMassPerCylinderX =\n",
+    MassCenterX,
+    MassEndHorX,
+    MassEndVertX,
+    WaterMassPerCylinderX
+  );
+  FullLog += writeLog(
+    "MassCenterY, MassEndHorY, MassEndVertY, WaterMassPerCylinderY =\n",
+    MassCenterY,
+    MassEndHorY,
+    MassEndVertY,
+    WaterMassPerCylinderY
+  );
 
   const r1X = AreaMemVertX / AreaCenter;
   const r1Y = AreaMemVertY / AreaCenter;
@@ -359,23 +316,23 @@ export const BldgDynamics = (
   const freqStarY = (1 / (2 * Math.PI)) * Math.sqrt(kStarY / mStarY);
 
   FullLog += writeLog(
-      "r1X, r2X, kStarX, mStarX, gammaStarX, freqStarX =\n",
-      r1X,
-      r2X,
-      kStarX,
-      mStarX,
-      gammaStarX,
-      freqStarX
-    );
-    FullLog += writeLog(
-      "r1Y, r2Y, kStarY, mStarY, gammaStarY, freqStarY =\n",
-      r1Y,
-      r2Y,
-      kStarY,
-      mStarY,
-      gammaStarY,
-      freqStarY
-    );
+    "r1X, r2X, kStarX, mStarX, gammaStarX, freqStarX =\n",
+    r1X,
+    r2X,
+    kStarX,
+    mStarX,
+    gammaStarX,
+    freqStarX
+  );
+  FullLog += writeLog(
+    "r1Y, r2Y, kStarY, mStarY, gammaStarY, freqStarY =\n",
+    r1Y,
+    r2Y,
+    kStarY,
+    mStarY,
+    gammaStarY,
+    freqStarY
+  );
 
   const massUsefulX = gammaStarX ** 2 / mStarX;
   const massUsefulY = gammaStarY ** 2 / mStarY;
@@ -390,19 +347,19 @@ export const BldgDynamics = (
   const kTotalY = kGravityY + kAirSpringY;
 
   FullLog += writeLog(
-      "massUsefulX, kGravityX, kAirSpringX, kTotalX =\n",
-      massUsefulX,
-      kGravityX,
-      kAirSpringX,
-      kTotalX
-    );
-    FullLog += writeLog(
-      "massUsefulY, kGravityY, kAirSpringY, kTotalY =\n",
-      massUsefulY,
-      kGravityY,
-      kAirSpringY,
-      kTotalY
-    );
+    "massUsefulX, kGravityX, kAirSpringX, kTotalX =\n",
+    massUsefulX,
+    kGravityX,
+    kAirSpringX,
+    kTotalX
+  );
+  FullLog += writeLog(
+    "massUsefulY, kGravityY, kAirSpringY, kTotalY =\n",
+    massUsefulY,
+    kGravityY,
+    kAirSpringY,
+    kTotalY
+  );
 
   const AreaAir = (Math.PI * CONSTANTS.CylDiameter ** 2) / 4;
   const VolAirTotalX =
@@ -426,21 +383,21 @@ export const BldgDynamics = (
   const EachAirCylLengthY = VolAirCylY / AreaAir;
 
   FullLog += writeLog(
-      "AreaAir, VolAirTotalX, VolAirInsideWaterCylX, VolAirCylX, EachAirCylLengthX =\n",
-      AreaAir,
-      VolAirTotalX,
-      VolAirInsideWaterCylX,
-      VolAirCylX,
-      EachAirCylLengthX
-    );
-    FullLog += writeLog(
-      "AreaAir, VolAirTotalY, VolAirInsideWaterCylY, VolAirCylY, EachAirCylLengthY =\n",
-      AreaAir,
-      VolAirTotalY,
-      VolAirInsideWaterCylY,
-      VolAirCylY,
-      EachAirCylLengthY
-    );
+    "AreaAir, VolAirTotalX, VolAirInsideWaterCylX, VolAirCylX, EachAirCylLengthX =\n",
+    AreaAir,
+    VolAirTotalX,
+    VolAirInsideWaterCylX,
+    VolAirCylX,
+    EachAirCylLengthX
+  );
+  FullLog += writeLog(
+    "AreaAir, VolAirTotalY, VolAirInsideWaterCylY, VolAirCylY, EachAirCylLengthY =\n",
+    AreaAir,
+    VolAirTotalY,
+    VolAirInsideWaterCylY,
+    VolAirCylY,
+    EachAirCylLengthY
+  );
 
   const ExactNumWaterCylindersX = totalUsefulWaterMassX / massUsefulX;
   const ExactNumWaterCylindersY = totalUsefulWaterMassY / massUsefulY;
@@ -458,21 +415,21 @@ export const BldgDynamics = (
   const RoundUpNumAirCylindersY = Math.ceil(ExactNumAirCylindersY);
 
   FullLog += writeLog(
-      "ExactNumWaterCylindersX, RoundUpNumWaterCylindersX, TotalLengthAirCylinderX, ExactNumAirCylindersX, RoundUpNumAirCylindersX =\n",
-      ExactNumWaterCylindersX,
-      RoundUpNumWaterCylindersX,
-      TotalLengthAirCylinderX,
-      ExactNumAirCylindersX,
-      RoundUpNumAirCylindersX
-    );
-    FullLog += writeLog(
-      "ExactNumWaterCylindersY, RoundUpNumWaterCylindersY, TotalLengthAirCylinderY, ExactNumAirCylindersY, RoundUpNumAirCylindersY =\n",
-      ExactNumWaterCylindersY,
-      RoundUpNumWaterCylindersY,
-      TotalLengthAirCylinderY,
-      ExactNumAirCylindersY,
-      RoundUpNumAirCylindersY
-    );
+    "ExactNumWaterCylindersX, RoundUpNumWaterCylindersX, TotalLengthAirCylinderX, ExactNumAirCylindersX, RoundUpNumAirCylindersX =\n",
+    ExactNumWaterCylindersX,
+    RoundUpNumWaterCylindersX,
+    TotalLengthAirCylinderX,
+    ExactNumAirCylindersX,
+    RoundUpNumAirCylindersX
+  );
+  FullLog += writeLog(
+    "ExactNumWaterCylindersY, RoundUpNumWaterCylindersY, TotalLengthAirCylinderY, ExactNumAirCylindersY, RoundUpNumAirCylindersY =\n",
+    ExactNumWaterCylindersY,
+    RoundUpNumWaterCylindersY,
+    TotalLengthAirCylinderY,
+    ExactNumAirCylindersY,
+    RoundUpNumAirCylindersY
+  );
 
   // Calculate final output numbers
   const NCYLX = RoundUpNumAirCylindersX + RoundUpNumWaterCylindersX;
