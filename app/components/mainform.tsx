@@ -51,7 +51,7 @@ const recalculate = () => {
 };
 
 const BuildingForm = ({ setBldg }: { setBldg: any }) => {
-  let displayUnits = {
+  const displayUnits = {
     force: "kips",
     length: "ft",
     time: "s",
