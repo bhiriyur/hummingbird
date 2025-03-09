@@ -51,20 +51,24 @@ const recalculate = () => {
 };
 
 const BuildingForm = ({ setBldg }: { setBldg: any }) => {
-  const units = {
+  let displayUnits = {
     force: "kips",
     length: "ft",
     time: "s",
   };
-  const [numFloors, setNumFloors] = useState(building.N);
-  const [bldgHeight, setbldgHeight] = useState(building.BZ);
-  const [bldgXwidth, setbldgXwidth] = useState(building.BX);
-  const [bldgYwidth, setbldgYwidth] = useState(building.BY);
+
   const systems = [
     "Steel moment-resisting frame",
     "Steel braced frame",
     "Concrete shear walls",
   ];
+
+  const locations = ["On Roof", "In Modules"];
+
+  const [numFloors, setNumFloors] = useState(building.N);
+  const [bldgHeight, setbldgHeight] = useState(building.BZ);
+  const [bldgXwidth, setbldgXwidth] = useState(building.BX);
+  const [bldgYwidth, setbldgYwidth] = useState(building.BY);
   const [bldgSystem, setbldgSystem] = useState(systems[0]);
 
   const [xPeriodChecked, setxPeriodChecked] = useState(true);
@@ -92,16 +96,14 @@ const BuildingForm = ({ setBldg }: { setBldg: any }) => {
   const [yModalMass, setyModalMass] = useState(2000);
 
   // DAMPER SETTINGS
-  const locations = ["On Roof", "In Modules"];
   const [xDamperLocation, setxDamperLocation] = useState(locations[0]);
   const [yDamperLocation, setyDamperLocation] = useState(locations[1]);
-  const [xAccelReduction, setxAccelReduction] = useState(damper?.AccRedX);
-  const [yAccelReduction, setyAccelReduction] = useState(damper?.AccRedY);
+  const [xAccelReduction, setxAccelReduction] = useState(damper?.AccRedX || 40);
+  const [yAccelReduction, setyAccelReduction] = useState(damper?.AccRedY || 40);
   const [xTotalDamping, setxTotalDamping] = useState(1.5);
   const [yTotalDamping, setyTotalDamping] = useState(1.2);
   const [moduleLength, setmoduleLength] = useState(damper?.ModL || 20);
   const [moduleWidth, setmoduleWidth] = useState(damper?.ModW || 8);
-
   const [xOption, setXOption] = useState(false);
   const [yOption, setYOption] = useState(false);
 
@@ -270,7 +272,7 @@ const BuildingForm = ({ setBldg }: { setBldg: any }) => {
                     input: {
                       endAdornment: (
                         <InputAdornment position="end">
-                          {units.length}
+                          {displayUnits.length}
                         </InputAdornment>
                       ),
                     },
@@ -293,7 +295,7 @@ const BuildingForm = ({ setBldg }: { setBldg: any }) => {
                     input: {
                       endAdornment: (
                         <InputAdornment position="end">
-                          {units.length}
+                          {displayUnits.length}
                         </InputAdornment>
                       ),
                     },
@@ -316,7 +318,7 @@ const BuildingForm = ({ setBldg }: { setBldg: any }) => {
                     input: {
                       endAdornment: (
                         <InputAdornment position="end">
-                          {units.length}
+                          {displayUnits.length}
                         </InputAdornment>
                       ),
                     },
@@ -372,7 +374,7 @@ const BuildingForm = ({ setBldg }: { setBldg: any }) => {
                       readOnly: xPeriodChecked ? true : false,
                       endAdornment: (
                         <InputAdornment position="end">
-                          {units.time}
+                          {displayUnits.time}
                         </InputAdornment>
                       ),
                       startAdornment: (
@@ -476,7 +478,7 @@ const BuildingForm = ({ setBldg }: { setBldg: any }) => {
                       readOnly: xModalMassChecked ? true : false,
                       endAdornment: (
                         <InputAdornment position="end">
-                          {units.force}
+                          {displayUnits.force}
                         </InputAdornment>
                       ),
                       startAdornment: (
@@ -528,7 +530,7 @@ const BuildingForm = ({ setBldg }: { setBldg: any }) => {
                       readOnly: yPeriodChecked ? true : false,
                       endAdornment: (
                         <InputAdornment position="end">
-                          {units.time}
+                          {displayUnits.time}
                         </InputAdornment>
                       ),
                       startAdornment: (
@@ -632,7 +634,7 @@ const BuildingForm = ({ setBldg }: { setBldg: any }) => {
                       readOnly: yModalMassChecked ? true : false,
                       endAdornment: (
                         <InputAdornment position="end">
-                          {units.force}
+                          {displayUnits.force}
                         </InputAdornment>
                       ),
                       startAdornment: (
@@ -918,7 +920,7 @@ const BuildingForm = ({ setBldg }: { setBldg: any }) => {
                     input: {
                       endAdornment: (
                         <InputAdornment position="end">
-                          {units.length}
+                          {displayUnits.length}
                         </InputAdornment>
                       ),
                     },
@@ -941,7 +943,7 @@ const BuildingForm = ({ setBldg }: { setBldg: any }) => {
                     input: {
                       endAdornment: (
                         <InputAdornment position="end">
-                          {units.length}
+                          {displayUnits.length}
                         </InputAdornment>
                       ),
                     },
