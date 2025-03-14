@@ -131,7 +131,7 @@ export const BldgDynamics = (
   } else {
     // ZetaTotal given, Calculate Acceleration Reduction
     ZetaAddHBX = ZetaTotalX - ZetaX;
-    AccRedX = 1 + Math.sqrt(ZetaX / ZetaTotalX);
+    AccRedX = 1 - Math.sqrt(ZetaX / ZetaTotalX);
   }
 
   if (!OptionY) {
@@ -141,7 +141,7 @@ export const BldgDynamics = (
   } else {
     // ZetaTotal given, Calculate Acceleration Reduction
     ZetaAddHBY = ZetaTotalY - ZetaY;
-    AccRedY = 1 + Math.sqrt(ZetaY / ZetaTotalY);
+    AccRedY = 1 - Math.sqrt(ZetaY / ZetaTotalY);
   }
 
   const AccRatioX = Math.sqrt(ZetaX / ZetaTotalX);
