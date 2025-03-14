@@ -224,8 +224,8 @@ export const BldgDynamics = (
   let MaxCylLengthX = BX;
   let MaxCylLengthY = BY;
 
-  if (LocX === 2) MaxCylLengthX = ModL;
-  if (LocY === 2) MaxCylLengthY = ModL;
+  if (LocX === 1) MaxCylLengthX = ModL;
+  if (LocY === 1) MaxCylLengthY = ModL;
 
   // Deducting Roof Clearance
   MaxCylLengthX -= CONSTANTS.RoofClearance;
