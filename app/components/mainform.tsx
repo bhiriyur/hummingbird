@@ -239,7 +239,7 @@ const BuildingForm = ({ setBldg }: { setBldg: any }) => {
             <Grid
               container
               rowSpacing={2}
-              columnSpacing={{ xs: 1, sm: 2, md: 3 }}
+              columnSpacing={{ xs: 1, sm: 1, md: 2 }}
             >
               {/* Building Design */}
               <Grid size={3}>
@@ -681,7 +681,7 @@ const BuildingForm = ({ setBldg }: { setBldg: any }) => {
             <Grid
               container
               rowSpacing={2}
-              columnSpacing={{ xs: 1, sm: 2, md: 3 }}
+              columnSpacing={{ xs: 1, sm: 1, md: 2 }}
             >
               {/* X Damper */}
               <Grid size={4}>

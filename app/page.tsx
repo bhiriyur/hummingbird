@@ -22,10 +22,10 @@ export default function Home() {
     <main>
       <ResponsiveAppBar />
       <Grid container spacing={2}>
-        <Grid size={6}>
+        <Grid size={{ sm: 12, md: 6 }}>
           <BuildingForm setBldg={setBldg}></BuildingForm>
         </Grid>
-        <Grid size={6}>
+        <Grid size={{ sm: 12, md: 6 }}>
           <ViewTabs {...bldg}></ViewTabs>
         </Grid>
       </Grid>
