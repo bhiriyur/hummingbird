@@ -6,6 +6,11 @@ import BuildingForm from "./components/mainform";
 import ResponsiveAppBar from "./components/topnav";
 import ViewTabs from "./components/viewtabs";
 
+function DivCount({children, count}: {children: any, count: any}) {
+  console.log("Count = ", count);
+  return <div>{children}</div>;
+}
+
 export default function Home() {
   const [bldg, setBldg] = useState({
     BX: 80,
@@ -18,17 +23,33 @@ export default function Home() {
     LOGS: "",
   });
 
+  const [units, setUnits] = useState(1);
+  const [count, setCount] = useState(1);
+
   return (
     <main>
-      <ResponsiveAppBar />
-      <Grid container spacing={2}>
-        <Grid size={{ sm: 12, md: 6 }}>
-          <BuildingForm setBldg={setBldg}></BuildingForm>
+      <ResponsiveAppBar
+        toggleUnits={() => {
+          console.log("Toggling units ", units);
+          setCount(count + 1);
+          if (units === 1) {
+            setUnits(2);
+          } else {
+            setUnits(1);
+          }
+        }}
+      />
+
+      <DivCount count={count}>
+        <Grid container spacing={2}>
+          <Grid size={{ sm: 12, md: 6 }}>
+            <BuildingForm setBldg={setBldg} units={units}></BuildingForm>
+          </Grid>
+          <Grid size={{ sm: 12, md: 6 }}>
+            <ViewTabs {...bldg}></ViewTabs>
+          </Grid>
         </Grid>
-        <Grid size={{ sm: 12, md: 6 }}>
-          <ViewTabs {...bldg}></ViewTabs>
-        </Grid>
-      </Grid>
+      </DivCount>
     </main>
   );
 }

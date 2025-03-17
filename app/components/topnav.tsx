@@ -16,11 +16,12 @@ import Image from "next/image";
 import { useState } from "react";
 import logo from "../../public/cropped-hummingbird_logo_blue-32x32.png";
 
-function ResponsiveAppBar() {
+function ResponsiveAppBar({toggleUnits} : {toggleUnits: () => void}) {
+ 
   const actions = [
     { icon: <PrintIcon />, name: "Print" },
     { icon: <ShareIcon />, name: "Share" },
-    { icon: <BalanceIcon />, name: "Toggle units US/SI" },
+    { icon: <BalanceIcon />, name: "Toggle units US/SI", handler: toggleUnits },
   ];
 
   const [open, setOpen] = useState(false);
@@ -60,15 +61,15 @@ function ResponsiveAppBar() {
             FabProps={{ size: "small", style: { backgroundColor: "primary" } }}
             ariaLabel="SpeedDial"
             sx={{ position: "absolute", right: 16 }}
-            icon={<SpeedDialIcon/>}
+            icon={<SpeedDialIcon />}
             direction="left"
-            >
+          >
             {actions.map((action) => (
               <SpeedDialAction
                 key={action.name}
                 icon={action.icon}
-                tooltipTitle={action.name}                
-                onClick={handleOpen}
+                tooltipTitle={action.name}
+                onClick={action.handler || handleOpen}
               />
             ))}
           </SpeedDial>

@@ -45,17 +45,23 @@ const damper: damperProps = {
   OptionY: true,
 };
 
-const recalculate = () => {
+const recalculate = (units: number) => {
   console.log("Recalculating...");
-  return calcs.BldgDynamics(building, damper);
+  return calcs.BldgDynamics(building, damper, units);
 };
 
-const BuildingForm = ({ setBldg }: { setBldg: any }) => {
-  const displayUnits = {
+const BuildingForm = ({ setBldg, units }: { setBldg: any, units: number }) => {
+
+  let displayUnits = {
     force: "kips",
     length: "ft",
     time: "s",
   };
+
+  if (units === 2) {
+    displayUnits.force = "tonnes";
+    displayUnits.length = "m";
+  }
 
   const systems = [
     "Steel moment-resisting frame",
@@ -145,7 +151,7 @@ const BuildingForm = ({ setBldg }: { setBldg: any }) => {
     console.log("DAMPER CHANGED: ", damper);
 
     // Recalculate and update values
-    const outputs = recalculate();
+    const outputs = recalculate(units);
 
     // Set increment count
     setBldg({
@@ -153,13 +159,13 @@ const BuildingForm = ({ setBldg }: { setBldg: any }) => {
       BX: bldgXwidth,
       BY: bldgYwidth,
       BZ: bldgHeight,
-      CYLDIA: calcs.CONSTANTS.CylDiameter * 3.28084, // TODO: Units checl
+      CYLDIA: (units == 1 ? 3.28084 : 1) * calcs.CONSTANTS.CylDiameter,
       XLOC: xDamperLocation,
       NCYLX: outputs.NCYLX,
-      LCYLX: outputs.LCYLX, // TODO: Units check
+      LCYLX: outputs.LCYLX,
       YLOC: yDamperLocation,
       NCYLY: outputs.NCYLY,
-      LCYLY: outputs.LCYLY, // TODO: Units check
+      LCYLY: outputs.LCYLY,
       MODL: moduleLength,
       MODW: moduleWidth,
       LOGS: outputs.CalcLogs,
@@ -175,8 +181,8 @@ const BuildingForm = ({ setBldg }: { setBldg: any }) => {
     if (yIntrinsicDampingChecked)
       setyIntrinsicDamping(fix3(outputs.ZetaY * 100));
     // kips / tonnes
-    if (xModalMassChecked) setxModalMass(fix3(outputs.WX / 1000)); // TODO: Units check
-    if (yModalMassChecked) setyModalMass(fix3(outputs.WY / 1000)); // TODO: Units check
+    if (xModalMassChecked) setxModalMass(fix3(outputs.WX / 1000));
+    if (yModalMassChecked) setyModalMass(fix3(outputs.WY / 1000));
 
     if (!xOption) {
       // Acceleration Reduction is given, Calculate ZetaTotal

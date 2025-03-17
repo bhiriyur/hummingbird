@@ -32,7 +32,8 @@ const writeLog = (...args: any[]) => {
 
 export const BldgDynamics = (
   building: buildingProps,
-  damper: damperProps
+  damper: damperProps,
+  units: number
 ): outputProps => {
   // US -> SI
   const ft2m = (e: number) => 0.3048 * e;
@@ -40,7 +41,7 @@ export const BldgDynamics = (
   const kgs2lbs = (e: number) => 2.205 * e;
   const lbs2kgs = (e: number) => 0.453592 * e;
 
-  let { BX, BY, BZ: H, units } = building;
+  let { BX, BY, BZ: H } = building;
   const { N, S } = building;
   let { ModL, ModW, AccRedX, AccRedY, ZetaTotalX, ZetaTotalY } = damper;
   const { LocX, LocY, OptionX, OptionY } = damper;

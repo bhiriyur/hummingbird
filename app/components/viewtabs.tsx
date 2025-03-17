@@ -63,7 +63,6 @@ function ShowCalcLogs(props: buildingProps) {
 
 const ViewTabs = (props: buildingProps) => {
   const [value, setValue] = React.useState(0);
-
   return (
     <Card style={{ height: "100%", backgroundColor: "#FFFFFA" }}>
       <Tabs

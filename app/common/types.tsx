@@ -5,7 +5,6 @@ export interface buildingProps {
   BZ: number; // Building Height
   BX: number; // Building X- Width
   BY: number; // Building Y - Width
-  units?: number; // Unit system 1 = US, 2 = SI (default = SI)
   S?: number; // Structural System (default = 1)
   TX?: number;
   TY?: number;
