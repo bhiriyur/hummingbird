@@ -6,7 +6,6 @@ const building: buildingProps = {
   BZ: 400,
   BX: 80,
   BY: 55,
-  units: 1,
   S: 1,
   LOGS: "",
 };
@@ -24,6 +23,7 @@ const damper: damperProps = {
   OptionY: false,
 };
 
-const output: outputProps = BldgDynamics(building, damper);
+const units = 1;
+const output: outputProps = BldgDynamics(building, damper, units);
 
 console.log("Output = ", output);
