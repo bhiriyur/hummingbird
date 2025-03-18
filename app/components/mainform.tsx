@@ -239,7 +239,7 @@ const BuildingForm = ({ setBldg, units }: { setBldg: any, units: number }) => {
           aria-controls="panel1-content"
           id="panel1-header"
         >
-          <Typography component="span">BUILDING</Typography>
+          <Typography component="span">BUILDING ({units == 1 ? 'US' : 'SI'} units)</Typography>
         </AccordionSummary>
         <AccordionDetails>
           <Box sx={{ width: "100%" }}>
