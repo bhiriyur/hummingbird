@@ -4,7 +4,7 @@ export const CONSTANTS = {
   RhoBuild: 192.22156048751998, // kg/m^3 Nominal density of bulding 12 lb/ft**3
   wm: 250, // Module area mass (kg / m^2)
   wf: 75, // Facade area mass (kg / m ^2)
-  acclg: 9.807, // (accln due to graviTY: m / s**2)
+  acclg: 9.80665, // (accln due to graviTY: m / s**2)
   AccTargetBuild: (18 * 9.807) / 1000,
   FreqMod: 1.0, // 100 %
   MembraneFill: 0.55, // 55%
