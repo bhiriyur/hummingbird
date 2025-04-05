@@ -18,23 +18,28 @@ function RoofCylinders(props: buildingProps) {
   // Render Roof cylinder elements
   const { BX, BY, BZ } = props;
   const dia = props?.CYLDIA ? props.CYLDIA : 1.0;
-  // Center of roof top
-  const origin = [0.5 * BX, 0.5 * BY, BZ + 0.5 * dia];
+  
+  const NX = (props?.XLOC == "On Roof" ? props.NCYLX : 0) || 0;
+  const NY = (props?.YLOC == "On Roof" ? props.NCYLY : 0) || 0;
 
-  const NX = props?.XLOC == "On Roof" ? props.NCYLX : 0;
   const LX = props?.LCYLX ? props.LCYLX : 40;
+  const LY = props?.LCYLY ? props.LCYLY : 40;
+
+  // Center of roof top
+  const offsetX = dia * -0.5 * NX + 0.5 * dia;
+  const offsetY = dia * -0.5 * NY + 0.5 * dia;
+  const originX = [0.5 * BX, 0.5 * BY, BZ + 0.5 * dia];
+  const originY = [0.5 * BX, 0.5 * BY, BZ + 0.5 * dia];
 
   const cylsX = [];
   for (let i = 0; i < (NX || 0); i++) {
-    cylsX.push(new THREE.Vector3(origin[0], origin[1] + i * dia, origin[2]));
+    cylsX.push(new THREE.Vector3(originX[0], offsetX + originX[1] + i * dia, originX[2]));
   }
 
-  const NY = props?.YLOC == "On Roof" ? props.NCYLY : 0;
-  const LY = props?.LCYLY ? props.LCYLY : 40;
 
   const cylsY = [];
   for (let i = 0; i < (NY || 0); i++) {
-    cylsY.push(new THREE.Vector3(origin[0] + i * dia, origin[1], origin[2]));
+    cylsY.push(new THREE.Vector3(offsetY + originY[0] + i * dia, originY[1], originY[2]));
   }
 
   return (
