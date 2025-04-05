@@ -443,7 +443,7 @@ export const BldgDynamics = (
   const NCYLX = RoundUpNumAirCylindersX + RoundUpNumWaterCylindersX;
   const LCYLX = units == 1 ? m2ft(MaxCylLengthX) : MaxCylLengthX;
   const NCYLY = RoundUpNumAirCylindersY + RoundUpNumWaterCylindersY;
-  const LCYLY = units == 1 ? m2ft(MaxCylLengthY) : MaxCylLengthX;;
+  const LCYLY = units == 1 ? m2ft(MaxCylLengthY) : MaxCylLengthY;
 
   // Convert Units back to US if required
   if (units === 1) {
