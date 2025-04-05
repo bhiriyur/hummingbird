@@ -47,7 +47,7 @@ export const BldgDynamics = (
   const { LocX, LocY, OptionX, OptionY } = damper;
 
   let CalcLogs =
-    "NOTE: INPUTS PROVIDED IN US UNITS.\nALL CALCULATIONS ARE PERFORMED IN SI UNITS.\n\n";
+    "NOTE: ALL CALCULATIONS ARE PERFORMED IN SI UNITS.\n\n";
   units = units || 1;
   CalcLogs += writeLog("UNITS =\n", units);
 
